@@ -1,10 +1,10 @@
 package com.shipper.model;
 
-import java.util.List;
+import org.json.JSONObject;
 
-public class Shop {
+public class Shop extends User{
 
-	private long shopId;
+	private int shopId;
 	
 	private String shopName;
 	private String address;
@@ -14,11 +14,35 @@ public class Shop {
 	private String bankInfo;
 	
 	
-	
+	public Shop(String userName, String password) {
+		super(userName, password, User.role_shop);
+		this.shopId = -1;
+		this.shopName = "";
+		this.address = "";
+		this.facebook = "";
+		this.zalo = "";
+		this.bankInfo = "";
+	}
 
 	public Shop() {
 		super();
 	}
+	
+	public JSONObject toJSON() {
+		JSONObject o = new JSONObject();
+		
+		o.put("userName", this.getUserName());
+		o.put("phoneNumber", this.getPhoneNumber());
+		o.put("status", this.getStatus());
+		o.put("address", this.getAddress());
+		o.put("bankInfo", this.getBankInfo());
+		o.put("facebook", this.getFacebook());
+		o.put("zalo", this.getZalo());
+		
+		return o;
+	}
+	
+	
 
 	public Shop(String shopName, String address, String facebook,
 			String zalo, String bankInfo) {
@@ -27,16 +51,16 @@ public class Shop {
 		this.address = address;
 		this.facebook = facebook;
 		this.zalo = zalo;
-		this.bankInfo = bankInfo;
+		this.setBankInfo(bankInfo);
 	}
 
 	
 	
-	public long getShopId() {
+	public int getShopId() {
 		return shopId;
 	}
 
-	public void setShopId(long shopId) {
+	public void setShopId(int shopId) {
 		this.shopId = shopId;
 	}
 
@@ -70,6 +94,20 @@ public class Shop {
 
 	public void setZalo(String zalo) {
 		this.zalo = zalo;
+	}
+
+
+
+
+	public String getBankInfo() {
+		return bankInfo;
+	}
+
+
+
+
+	public void setBankInfo(String bankInfo) {
+		this.bankInfo = bankInfo;
 	}
 
 

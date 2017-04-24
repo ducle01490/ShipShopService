@@ -1,7 +1,11 @@
 package com.shipper.model;
 
+import java.util.Date;
+
+import org.json.JSONObject;
+
 public class Shipper extends User {
-	private long shipperId;
+	private int shipperId;
 	
 	private String shipperName;
 	private String motorNumber;
@@ -13,12 +17,19 @@ public class Shipper extends User {
 	private String preLoginDid;
 	private String preLoginGps;
 	
-	
 	private String currentGps;
 	private long updateGpsTime;
 	
 	
-	
+	public Shipper(String userName, String password) {
+		super(userName, password, User.role_shop);
+		this.shipperId = -1;
+		this.shipperName = "";
+		this.address = "";
+		this.idNumber = "";
+		this.birthDay = "";
+		this.motorNumber = "";
+	}
 	
 	public Shipper() {
 		super();
@@ -41,15 +52,29 @@ public class Shipper extends User {
 		this.updateGpsTime = updateGpsTime;
 	}
 	
+	public JSONObject toJSON() {
+		JSONObject o = new JSONObject();
+		
+		o.put("userName", this.getUserName());
+		o.put("phoneNumber", this.getPhoneNumber());
+		o.put("status", this.getStatus());
+		o.put("shipperName", this.getShipperName());
+		o.put("motorNumber", this.getMotorNumber());
+		o.put("birthDay", this.getBirthDay());
+		o.put("idNumber", this.getIdNumber());
+		
+		return o;
+	}
 	
 	
 	
 	
-	public long getShipperId() {
+	
+	public int getShipperId() {
 		return shipperId;
 	}
 
-	public void setShipperId(long shipperId) {
+	public void setShipperId(int shipperId) {
 		this.shipperId = shipperId;
 	}
 
@@ -116,7 +141,10 @@ public class Shipper extends User {
 	
 	
 	
-	
+	public static void main(String[] args) {
+		Date d = new Date();
+		System.out.println(d.getTime());
+	}
 	
 
 }

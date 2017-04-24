@@ -1,11 +1,23 @@
 package com.shipper.model;
 
+import org.json.JSONObject;
+
 public class OrderInfo {
+	public static final int order_wait = 0;
+	public static final int order_bidded = 1;
+	public static final int order_shipped = 2;
+	public static final int order_received = 3;
+	public static final int order_finish = 4;
+	public static final int order_cancel = 5;
+	public static final int order_error = 6;
 	
-	private long orderId;
 	
+	private int orderId;
+	private String orderTitle;
+	
+	private String shopUserName;
 	private String shopName;
-	private String shopId;
+	private int shopId;
 	
 	private String receiveAddress;
 	private String customerAddress;
@@ -21,17 +33,33 @@ public class OrderInfo {
 	
 	
 	
+	private int orderStatus;
+	private long shipperId;
+	private String shipperName;
+	private String shipperUserName;
+	
+	private long startTime;
+	private long finishTime;
+	
+	private int statusShopConfirmed;
+	private int statusShipperConfirmed;
+	
+	
+	private long created;
+	private long updated;
+	
+	
+	
 	public OrderInfo() {
 		super();
 	}
-	public OrderInfo(long orderId, String shopName, String shopId,
+	public OrderInfo(int orderId, String shopName, int shopId,
 			String receiveAddress, String customerAddress, String customerName,
 			String customerPhone, int deliveryType, long deliveryPrice,
 			long productPrice, String noteTime, String noteProduct) {
 		super();
 		this.orderId = orderId;
 		this.shopName = shopName;
-		this.shopId = shopId;
 		this.receiveAddress = receiveAddress;
 		this.customerAddress = customerAddress;
 		this.customerName = customerName;
@@ -42,10 +70,66 @@ public class OrderInfo {
 		this.noteTime = noteTime;
 		this.noteProduct = noteProduct;
 	}
-	public long getOrderId() {
+	
+	public JSONObject infoToJSON() {
+		JSONObject o = new JSONObject();
+		
+		o.put("orderId", this.getOrderId());
+		o.put("shopId", this.getShopId());
+		o.put("shopName", this.getShopName());
+		
+		o.put("receiveAddress", this.getReceiveAddress());
+		o.put("customerAddress", this.getCustomerAddress());
+		o.put("customerName", this.getCustomerName());
+		
+		o.put("deliveryType", this.getDeliveryType());
+		o.put("deliveryPrice", this.getDeliveryPrice());
+		o.put("productPrice", this.getProductPrice());
+		o.put("noteTime", this.getNoteTime());
+		o.put("noteProduct", this.getNoteProduct());
+		
+		o.put("orderStatus", this.getOrderStatus());
+		
+		return o;
+	}
+	
+	public JSONObject fullToJSON() {
+		JSONObject o = new JSONObject();
+		
+		o.put("orderId", this.getOrderId());
+		o.put("shopId", this.getShopId());
+		o.put("shopName", this.getShopName());
+		
+		o.put("receiveAddress", this.getReceiveAddress());
+		o.put("customerAddress", this.getCustomerAddress());
+		o.put("customerName", this.getCustomerName());
+		
+		o.put("deliveryType", this.getDeliveryType());
+		o.put("deliveryPrice", this.getDeliveryPrice());
+		o.put("productPrice", this.getProductPrice());
+		o.put("noteTime", this.getNoteTime());
+		o.put("noteProduct", this.getNoteProduct());
+		
+		o.put("orderStatus", this.getOrderStatus());
+		
+		o.put("shipperId", this.getShipperId());
+		o.put("shipperUserName", this.getShipperUserName());
+		o.put("shipperName", this.getShipperName());
+		o.put("startTime", this.getStartTime());
+		o.put("finishTime", this.getFinishTime());
+		o.put("statusShopConfirmed", this.getStatusShopConfirmed());
+		o.put("statusShipperConfirmed", this.getStatusShipperConfirmed());
+		
+		o.put("created", this.getCreated());
+		o.put("updated", this.getUpdated());
+		
+		return o;
+	}
+	
+	public int getOrderId() {
 		return orderId;
 	}
-	public void setOrderId(long orderId) {
+	public void setOrderId(int orderId) {
 		this.orderId = orderId;
 	}
 	public String getShopName() {
@@ -54,12 +138,7 @@ public class OrderInfo {
 	public void setShopName(String shopName) {
 		this.shopName = shopName;
 	}
-	public String getShopId() {
-		return shopId;
-	}
-	public void setShopId(String shopId) {
-		this.shopId = shopId;
-	}
+
 	public String getReceiveAddress() {
 		return receiveAddress;
 	}
@@ -114,7 +193,84 @@ public class OrderInfo {
 	public void setNoteProduct(String noteProduct) {
 		this.noteProduct = noteProduct;
 	}
+	public String getShopUserName() {
+		return shopUserName;
+	}
+	public void setShopUserName(String shopUserName) {
+		this.shopUserName = shopUserName;
+	}
+	public int getShopId() {
+		return shopId;
+	}
+	public void setShopId(int shopId) {
+		this.shopId = shopId;
+	}
 	
-	
+	public int getOrderStatus() {
+		return orderStatus;
+	}
+	public void setOrderStatus(int orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+	public long getShipperId() {
+		return shipperId;
+	}
+	public void setShipperId(long shipperId) {
+		this.shipperId = shipperId;
+	}
+	public String getShipperName() {
+		return shipperName;
+	}
+	public void setShipperName(String shipperName) {
+		this.shipperName = shipperName;
+	}
+	public long getStartTime() {
+		return startTime;
+	}
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+	public long getFinishTime() {
+		return finishTime;
+	}
+	public void setFinishTime(long finishTime) {
+		this.finishTime = finishTime;
+	}
+	public int getStatusShopConfirmed() {
+		return statusShopConfirmed;
+	}
+	public void setStatusShopConfirmed(int statusShopConfirmed) {
+		this.statusShopConfirmed = statusShopConfirmed;
+	}
+	public int getStatusShipperConfirmed() {
+		return statusShipperConfirmed;
+	}
+	public void setStatusShipperConfirmed(int statusShipperConfirmed) {
+		this.statusShipperConfirmed = statusShipperConfirmed;
+	}
+	public String getShipperUserName() {
+		return shipperUserName;
+	}
+	public void setShipperUserName(String shipperUserName) {
+		this.shipperUserName = shipperUserName;
+	}
+	public String getOrderTitle() {
+		return orderTitle;
+	}
+	public void setOrderTitle(String orderTitle) {
+		this.orderTitle = orderTitle;
+	}
+	public long getCreated() {
+		return created;
+	}
+	public void setCreated(long created) {
+		this.created = created;
+	}
+	public long getUpdated() {
+		return updated;
+	}
+	public void setUpdated(long updated) {
+		this.updated = updated;
+	}
 
 }

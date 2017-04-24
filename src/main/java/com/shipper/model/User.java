@@ -1,27 +1,28 @@
 package com.shipper.model;
 
 public class User {
-	public static final int s_nonVerified = 0;
-	public static final int s_activated = 1;
-	public static final int s_deactivated = 2;
+	public static final int s_nonPhone = 0;
+	public static final int s_nonVerified = 1;
+	public static final int s_activated = 2;
+	public static final int s_deactivated = 3;
 	
 	public static final int role_shop = 1;
 	public static final int role_shipper = 2;
 	
 	
 	private String userName;
-	
 	private String phoneNumber;
 	private String password;
-	
 	private int status;
-	
 	private int role;
 	
-	
-	
-	
-	
+	public User(String userName, String password, int role) {
+		this.userName = userName;
+		this.password = password;
+		this.role = role;
+		this.status = s_nonPhone;
+		this.phoneNumber = "";
+	}
 
 	public User() {
 		super();
@@ -69,8 +70,6 @@ public class User {
 		this.status = status;
 	}
 
-	
-
 	public int getRole() {
 		return role;
 	}
@@ -78,9 +77,5 @@ public class User {
 	public void setRole(int role) {
 		this.role = role;
 	}
-
-	
-	
-	
 
 }
