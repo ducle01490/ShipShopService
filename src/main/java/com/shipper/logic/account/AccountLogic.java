@@ -264,9 +264,11 @@ public class AccountLogic {
 			Shop shop = new Shop(userName, hashPassword(password));
 			boolean r = ShopDAO.createShopAccount(shop);
 			if (r) {
+				String session = updateUserSession(userName, User.role_shop);
 				result.put("status", Constant.status_ok);
 
 				data.put("result", "success");
+				data.put("sessionKey", session);
 				result.put("data", data);
 
 				error.put("code", Constant.error_non);
@@ -298,12 +300,14 @@ public class AccountLogic {
 				return result;
 			}
 
-			Shipper shipper = new Shipper(userName, password);
+			Shipper shipper = new Shipper(userName, hashPassword(password));
 			boolean r = ShipperDAO.createShipperAccount(shipper);
 			if (r) {
+				String session = updateUserSession(userName, User.role_shipper);
 				result.put("status", Constant.status_ok);
 
 				data.put("result", "success");
+				data.put("sessionKey", session);
 				result.put("data", data);
 
 				error.put("code", Constant.error_non);
@@ -367,6 +371,7 @@ public class AccountLogic {
 
 				data.put("result", "success");
 				data.put("sessionKey", session);
+				data.put("userStatus", shop.getStatus());
 				result.put("data", data);
 
 				error.put("code", Constant.error_non);
@@ -399,12 +404,15 @@ public class AccountLogic {
 
 			Shipper shipper = r.get(0);
 			boolean res = passWord.equals(shipper.getPassword());
+			if (res == false)
+				res = checkPassword(passWord, shipper.getPassword());
 			if (res) {
 				String session = updateUserSession(userName, User.role_shipper);
 				result.put("status", Constant.status_ok);
 
 				data.put("result", "success");
 				data.put("sessionKey", session);
+				data.put("userStatus", shipper.getStatus());
 				result.put("data", data);
 
 				error.put("code", Constant.error_non);
@@ -607,7 +615,7 @@ public class AccountLogic {
 				if (checkCode) {
 					// Update password
 					boolean r = ShopDAO.updateShopPassword(userName,
-							newPassword);
+							hashPassword(newPassword));
 
 					if (r) {
 						result.put("status", Constant.status_ok);
@@ -662,7 +670,7 @@ public class AccountLogic {
 				if (checkCode) {
 					// Update password
 					boolean r = ShipperDAO.updateShipperPassword(userName,
-							newPassword);
+							hashPassword(newPassword));
 
 					if (r) {
 
@@ -887,7 +895,6 @@ public class AccountLogic {
 				boolean checkCode = checkShipCode(userName, verifiedCode);
 
 				if (checkCode) {
-					// Update password
 					boolean r = ShipperDAO.updateShipperStatus(userName,
 							User.s_activated);
 

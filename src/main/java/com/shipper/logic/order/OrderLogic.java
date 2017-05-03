@@ -529,8 +529,57 @@ public class OrderLogic {
 		JSONArray o = new JSONArray();
 		
 		for(OrderInfo order : orders) {
-			o.add(order.fullToJSON());
+			o.add(orderShipShop(order));
 		}
+		
+		return o;
+	}
+	
+	public static JSONObject shopShort(String userName) {
+		JSONObject s = new JSONObject();
+		
+		s.put("id", "");
+		s.put("userName", "");
+		s.put("phone", "");
+		s.put("address", "");
+		
+		List<Shop> shops = ShopDAO.getShopByUserName(userName);
+		if(shops.size() > 0) {
+			Shop shop = shops.get(0);
+			s.put("id", shop.getShopId());
+			s.put("userName", shop.getShopName());
+			s.put("phone", shop.getPhoneNumber());
+			s.put("address", shop.getAddress());
+		}
+		
+		return s;
+	}
+	
+	public static JSONObject shipperShort(String userName) {
+		JSONObject s = new JSONObject();
+		
+		s.put("id", "");
+		s.put("userName", "");
+		s.put("phone", "");
+		s.put("address", "");
+		
+		List<Shipper> shippers = ShipperDAO.getShipperByUserName(userName);
+		if(shippers.size() > 0) {
+			Shipper ship = shippers.get(0);
+			s.put("id", ship.getShipperId());
+			s.put("userName", ship.getShipperName());
+			s.put("phone", ship.getPhoneNumber());
+			s.put("address", ship.getAddress());
+		}
+		
+		return s;
+	}
+	
+	public static JSONObject orderShipShop(OrderInfo order) {
+		JSONObject o = order.fullToJSON();
+		
+		o.put("shopInfo", shopShort(order.getShopUserName()));
+		o.put("shipperInfo", shipperShort(order.getShipperUserName()));
 		
 		return o;
 	}
@@ -663,7 +712,7 @@ public class OrderLogic {
 		
 		result.put("status", Constant.status_ok);
 
-		data.put("orders", orderListToJSON(orders));
+		//data.put("orders", orderListToJSON(orders));
 		result.put("data", data);
 
 		error.put("code", Constant.error_non);

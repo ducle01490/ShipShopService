@@ -150,7 +150,7 @@ public class ShipperDAO {
 			stmt = conn.createStatement();
 
 			String sql = "UPDATE "
-					+ " ship SET"
+					+ " shipper SET"
 					+ " status = " + status + " "
 					+ " where userName = '" + userName + "'";
 			stmt.executeUpdate(sql);
@@ -185,7 +185,7 @@ public class ShipperDAO {
 			stmt = conn.createStatement();
 
 			String sql = "UPDATE "
-					+ " ship SET"
+					+ " shipper SET"
 					+ " status = " + User.s_nonVerified + ", "
 					+ " phoneNumber = '" + phoneNumber + "' "
 					+ " where userName = '" + userName + "'";

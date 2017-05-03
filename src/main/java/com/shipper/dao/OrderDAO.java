@@ -525,7 +525,7 @@ public class OrderDAO {
         return result;
     }
 	
-	public static List<ShipperAggregate> getAggregate(String sql) {
+	public static List<ShipperAggregate> getAggregate() {
 		List<ShipperAggregate> result = new ArrayList<ShipperAggregate>();
 		Connection conn = null;
 		Statement stmt = null;
@@ -534,11 +534,12 @@ public class OrderDAO {
 			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
             stmt = conn.createStatement();
             ResultSet rs;
+            String sql = "";
             rs = stmt.executeQuery(sql);
             while ( rs.next() ) {
-            	OrderInfo order = resultToOrderFull(rs);
-            	if(order!=null)
-            		result.add(order);
+            	ShipperAggregate aggregate = null;
+            	if(aggregate!=null)
+            		result.add(aggregate);
             }
             conn.close();
         } catch (Exception e) {
