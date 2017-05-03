@@ -8,18 +8,19 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.shipper.logic.Constant;
 import com.shipper.model.Shipper;
 import com.shipper.model.User;
 
 public class ShipperDAO {
 
-	// JDBC driver name and database URL
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost/shipshop";
-
-	// Database credentials
-	static final String USER = "root";
-	static final String PASS = "orek@db16";
+//	// JDBC driver name and database URL
+//	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+//	static final String DB_URL = "jdbc:mysql://localhost/shipshop";
+//
+//	// Database credentials
+//	static final String USER = "root";
+//	static final String PASS = "orek@db16";
 
 	public static void main(String[] args) {
 	}
@@ -34,7 +35,7 @@ public class ShipperDAO {
 	public static Shipper resultToShipper(ResultSet rs) {
 		Shipper shipper = new Shipper();
 		try {
-			shipper.setShipperId(rs.getInt("shipperId"));
+			shipper.setShipperId(rs.getInt("shipper_id"));
 			shipper.setUserName(rs.getString("userName"));
 			shipper.setPassword(rs.getString("password"));
 			shipper.setPhoneNumber(rs.getString("phoneNumber"));
@@ -65,7 +66,7 @@ public class ShipperDAO {
 		Statement stmt = null;
         try {
         	Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
             stmt = conn.createStatement();
             ResultSet rs;
             rs = stmt.executeQuery(sql);
@@ -109,7 +110,7 @@ public class ShipperDAO {
 		Statement stmt = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
 			stmt = conn.createStatement();
 
 			String sql = "UPDATE "
@@ -145,7 +146,7 @@ public class ShipperDAO {
 		Statement stmt = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
 			stmt = conn.createStatement();
 
 			String sql = "UPDATE "
@@ -180,7 +181,7 @@ public class ShipperDAO {
 		Statement stmt = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
 			stmt = conn.createStatement();
 
 			String sql = "UPDATE "
@@ -216,7 +217,7 @@ public class ShipperDAO {
 		Statement stmt = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
 			stmt = conn.createStatement();
 			
 
@@ -259,7 +260,7 @@ public class ShipperDAO {
 		Statement stmt = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
 			stmt = conn.createStatement();
 			
 
@@ -301,13 +302,15 @@ public class ShipperDAO {
 		
 		
 	}
+	
+	
 	public static boolean createShipperAccount(Shipper shipper) {
 		
 		Connection conn = null;
 		Statement stmt = null;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
 			stmt = conn.createStatement();
 
 			String sql = "INSERT INTO "

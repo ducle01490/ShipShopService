@@ -45,8 +45,8 @@ public class OrderInfo {
 	private int statusShipperConfirmed;
 	
 	
-	private long created;
-	private long updated;
+	private String created;
+	private String updated;
 	
 	
 	
@@ -97,12 +97,16 @@ public class OrderInfo {
 		JSONObject o = new JSONObject();
 		
 		o.put("orderId", this.getOrderId());
+		o.put("orderTitle", this.getOrderTitle());
+		
 		o.put("shopId", this.getShopId());
+		o.put("shopUserName", this.getShopUserName());
 		o.put("shopName", this.getShopName());
 		
 		o.put("receiveAddress", this.getReceiveAddress());
 		o.put("customerAddress", this.getCustomerAddress());
 		o.put("customerName", this.getCustomerName());
+		o.put("customerPhone", this.getCustomerPhone());
 		
 		o.put("deliveryType", this.getDeliveryType());
 		o.put("deliveryPrice", this.getDeliveryPrice());
@@ -258,18 +262,21 @@ public class OrderInfo {
 		return orderTitle;
 	}
 	public void setOrderTitle(String orderTitle) {
-		this.orderTitle = orderTitle;
+		if(orderTitle != null)
+			this.orderTitle = orderTitle;
+		else
+			this.orderTitle = "";
 	}
-	public long getCreated() {
+	public String getCreated() {
 		return created;
 	}
-	public void setCreated(long created) {
+	public void setCreated(String created) {
 		this.created = created;
 	}
-	public long getUpdated() {
+	public String getUpdated() {
 		return updated;
 	}
-	public void setUpdated(long updated) {
+	public void setUpdated(String updated) {
 		this.updated = updated;
 	}
 

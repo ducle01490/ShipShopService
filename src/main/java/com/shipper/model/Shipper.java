@@ -55,6 +55,7 @@ public class Shipper extends User {
 	public JSONObject toJSON() {
 		JSONObject o = new JSONObject();
 		
+		o.put("shipperId", this.getShipperId());
 		o.put("userName", this.getUserName());
 		o.put("phoneNumber", this.getPhoneNumber());
 		o.put("status", this.getStatus());

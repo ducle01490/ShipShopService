@@ -1,21 +1,26 @@
 package com.shipper.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.shipper.logic.Constant;
+import com.shipper.logic.Utils;
 import com.shipper.model.OrderInfo;
+import com.shipper.model.ShipperAggregate;
+import com.shipper.model.User;
 
 public class OrderDAO {
-	
-	
-	
-	
+
+
 	
 	
 	public static int getCurrentId() {
@@ -109,32 +114,67 @@ public class OrderDAO {
 			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
 			stmt = conn.createStatement();
 
-			String sql = "INSERT INTO "
-					+ " shipOrder(orderId, orderTitle, shopId, shopUserName, shopName,"
-					+ " receiveAddress, customerAddress, customerName, customerPhone,"
-					+ " deliveryType, deliveryPrice, productPrice, noteTime, noteProduct,"
-					+ " orderStatus"
-					+ ")"
-					+ " VALUES ("
-					+ " " + orderId + ", "
-					+ " '" + orderTitle + "', "
-					+ " " + shopId + ", "
-					+ " '" + shopUserName + "', "
-					+ " '" + shopName + "', "
-					
-					+ " '" + receiveAddress + "', "
-					+ " '" + customerAddress + "', "
-					+ " '" + customerName + "', "
-					+ " '" + customerPhone + "', "
-					+ " " + deliveryType + ", "
-					+ " " + deliveryPrice + ", "
-					+ " " + productPrice + ", "
-					+ " '" + noteTime + "', "
-					+ " '" + noteProduct + "', "
-					
-					+ " " + OrderInfo.order_wait + " "
-					+ ");";
-			stmt.executeUpdate(sql);
+//			String sql = "INSERT INTO "
+//					+ " shipOrder(orderId, orderTitle, shopId, shopUserName, shopName,"
+//					+ " receiveAddress, customerAddress, customerName, customerPhone,"
+//					+ " deliveryType, deliveryPrice, productPrice, noteTime, noteProduct,"
+//					+ " orderStatus, created"
+//					+ ")"
+//					+ " VALUES ("
+//					+ " " + orderId + ", "
+//					+ " '" + orderTitle + "', "
+//					+ " " + shopId + ", "
+//					+ " '" + shopUserName + "', "
+//					+ " '" + shopName + "', "
+//					
+//					+ " '" + receiveAddress + "', "
+//					+ " '" + customerAddress + "', "
+//					+ " '" + customerName + "', "
+//					+ " '" + customerPhone + "', "
+//					+ " " + deliveryType + ", "
+//					+ " " + deliveryPrice + ", "
+//					+ " " + productPrice + ", "
+//					+ " '" + noteTime + "', "
+//					+ " '" + noteProduct + "', "
+//					
+//					+ " " + OrderInfo.order_wait + " "
+//					
+//					+ ");";
+			
+			
+			// create a sql date object so we can use it in our INSERT statement
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+		    // the mysql insert statement
+		    String query = "INSERT INTO "
+						+ " shipOrder(orderId, orderTitle, shopId, shopUserName, shopName,"
+						+ " receiveAddress, customerAddress, customerName, customerPhone,"
+						+ " deliveryType, deliveryPrice, productPrice, noteTime, noteProduct,"
+						+ " orderStatus, created" + ")"
+						+ " VALUES ("+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "
+						+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "
+						+ " ?, "+ " ? "+ ");";
+		    PreparedStatement preparedStmt = conn.prepareStatement(query);
+		    preparedStmt.setInt (1, orderId);
+		    preparedStmt.setString (2, orderTitle);
+		    preparedStmt.setInt (3, shopId);
+		    preparedStmt.setString (4, shopUserName);
+		    preparedStmt.setString (5, shopName);
+		    preparedStmt.setString (6, receiveAddress);
+		    preparedStmt.setString (7, customerAddress);
+		    preparedStmt.setString (8, customerName);
+		    preparedStmt.setString (9, customerPhone);
+		    preparedStmt.setInt (10, deliveryType);
+		    preparedStmt.setLong(11, deliveryPrice);
+		    preparedStmt.setLong(12, productPrice);
+		    preparedStmt.setString (13, noteTime);
+		    preparedStmt.setString (14, noteProduct);
+		    preparedStmt.setInt (15, OrderInfo.order_wait);
+		    preparedStmt.setTimestamp(16, timestamp);
+
+		    // execute the preparedstatement
+		    preparedStmt.execute();
+			
 			return true;
 		} catch (SQLException se) {
 			se.printStackTrace();
@@ -158,8 +198,92 @@ public class OrderDAO {
 	}
 	
 	
+	public static boolean confirmOrderStatus(int orderId, int status, int role) {
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+			stmt = conn.createStatement();
+			if(role == User.role_shipper) {
+				String sql = "UPDATE "
+						+ " shipOrder SET"
+						+ " statusShipperConfirmed = " + status + " "
+						+ " where orderId = " + orderId + "";
+				stmt.executeUpdate(sql);
+			} else if(role == User.role_shop) {
+				String sql = "UPDATE "
+						+ " shipOrder SET"
+						+ " statusShopConfirmed = " + status + " "
+						+ " where orderId = " + orderId + "";
+				stmt.executeUpdate(sql);
+			}
+			return true;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					conn.close();
+			} catch (SQLException se) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
 	
 	
+	public static boolean updateOrderStatus(int orderId, int status, int role) {
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+			stmt = conn.createStatement();
+			if(role == User.role_shipper) {
+				String sql = "UPDATE "
+						+ " shipOrder SET"
+						+ " orderStatus = " + status + ", "
+						+ " statusShipperConfirmed = " + status + " "
+						+ " where orderId = " + orderId + "";
+				stmt.executeUpdate(sql);
+			} else if(role == User.role_shop) {
+				String sql = "UPDATE "
+						+ " shipOrder SET"
+						+ " orderStatus = " + status + ", "
+						+ " statusShopConfirmed = " + status + " "
+						+ " where orderId = " + orderId + "";
+				stmt.executeUpdate(sql);
+			}
+			return true;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					conn.close();
+			} catch (SQLException se) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
 	
 	public static boolean updateOrderStatus(int orderId, int status) {
 		Connection conn = null;
@@ -236,6 +360,9 @@ public class OrderDAO {
 		return false;
 	}
 	
+	
+
+	
 	public static boolean cancelOrder(int orderId) {
 		Connection conn = null;
 		Statement stmt = null;
@@ -275,7 +402,60 @@ public class OrderDAO {
 	
 	public static List<OrderInfo> getOrderFullById(int orderId) {
 		String sql = "SELECT * from shipOrder where orderId = " + orderId  + ";";
-		return getOrderInfo(sql);
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getOrderFull(int offset, int numb) {
+		String sql = "SELECT * from shipOrder order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getShopOrderFull(String shopUserName, int offset, int numb) {
+		
+		String sql = "SELECT * from shipOrder where shopUserName = '" + shopUserName + "' "
+				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getOrderFullByStatus(int orderStatus, int offset, int numb) {
+		String sql = "SELECT * from shipOrder where orderStatus = " + orderStatus
+				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getOrderFullByStatus(String shopUserName, int orderStatus, int offset, int numb) {
+		String sql = "SELECT * from shipOrder where shopUserName = '" + shopUserName + "' "
+				+ " AND orderStatus = " + orderStatus 
+				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getShopOrderFullByUpdatedtime(String shopUserName, int orderStatus, String startTime, String endTime) {
+		String sql = "SELECT * from shipOrder where shopUserName = '" + shopUserName + "' "
+				+ " AND orderStatus = " + orderStatus
+				+ " AND updated >= '" + startTime + "' AND updated <=  '" + endTime + "' "
+				+ "order by orderId desc";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getShopOrderFullByUpdatedtime(String shopUserName, String startTime, String endTime) {
+		String sql = "SELECT * from shipOrder where shopUserName = '" + shopUserName + "' "
+				+ " AND updated >= '" + startTime + "' AND updated <=  '" + endTime + "' "
+				+ "order by orderId desc";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getOrderFullByUpdatedtime(int orderStatus, String startTime, String endTime) {
+		String sql = "SELECT * from shipOrder where orderStatus = " + orderStatus + " "
+				+ " AND updated >= '" + startTime + "' AND updated <=  '" + endTime + "' "
+				+ "order by orderId desc";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getOrderFullByUpdatedtime(String startTime, String endTime) {
+		String sql = "SELECT * from shipOrder where updated >= '" + startTime + "' AND updated <=  '" + endTime + "' "
+				+ "order by orderId desc";
+		return getOrderFull(sql);
 	}
 	
 	public static OrderInfo resultToOrderFull(ResultSet rs) {
@@ -297,6 +477,7 @@ public class OrderDAO {
 			order.setProductPrice(rs.getLong("productPrice"));
 			order.setNoteTime(rs.getString("noteTime"));
 			order.setNoteProduct(rs.getString("noteProduct"));
+			
 			order.setOrderStatus(rs.getInt("orderStatus"));
 			
 			order.setShipperId(rs.getInt("shipperId"));
@@ -308,8 +489,8 @@ public class OrderDAO {
 			order.setStatusShipperConfirmed(rs.getInt("statusShopConfirmed"));
 			order.setStatusShipperConfirmed(rs.getInt("statusShipperConfirmed"));
 			
-			order.setCreated(rs.getTimestamp("created").getTime());
-			order.setUpdated(rs.getTimestamp("updated").getTime());
+			order.setCreated(rs.getTimestamp("created").toString());
+			order.setUpdated(rs.getTimestamp("updated").toString());
 			
 		} catch (SQLException e) {
 			
@@ -331,7 +512,7 @@ public class OrderDAO {
             ResultSet rs;
             rs = stmt.executeQuery(sql);
             while ( rs.next() ) {
-            	OrderInfo order = resultToOrderInfo(rs);
+            	OrderInfo order = resultToOrderFull(rs);
             	if(order!=null)
             		result.add(order);
             }
@@ -343,6 +524,30 @@ public class OrderDAO {
         
         return result;
     }
+	
+	public static List<ShipperAggregate> getAggregate(String sql) {
+		List<ShipperAggregate> result = new ArrayList<ShipperAggregate>();
+		Connection conn = null;
+		Statement stmt = null;
+        try {
+        	Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+            stmt = conn.createStatement();
+            ResultSet rs;
+            rs = stmt.executeQuery(sql);
+            while ( rs.next() ) {
+            	OrderInfo order = resultToOrderFull(rs);
+            	if(order!=null)
+            		result.add(order);
+            }
+            conn.close();
+        } catch (Exception e) {
+            System.err.println("Got an exception! ");
+            System.err.println(e.getMessage());
+        }
+        
+        return result;
+	}
 	
 
 }

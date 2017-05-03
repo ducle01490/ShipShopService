@@ -31,7 +31,10 @@ public class Shop extends User{
 	public JSONObject toJSON() {
 		JSONObject o = new JSONObject();
 		
+		o.put("shopId", this.getShopId());
 		o.put("userName", this.getUserName());
+		o.put("shopName", this.getShopName());
+		
 		o.put("phoneNumber", this.getPhoneNumber());
 		o.put("status", this.getStatus());
 		o.put("address", this.getAddress());
