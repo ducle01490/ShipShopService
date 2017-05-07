@@ -253,14 +253,14 @@ public class OrderDAO {
 						+ " shipOrder SET"
 						+ " orderStatus = " + status + ", "
 						+ " statusShipperConfirmed = " + status + " "
-						+ " where orderId = " + orderId + "";
+						+ " where orderId = " + orderId + ";";
 				stmt.executeUpdate(sql);
 			} else if(role == User.role_shop) {
 				String sql = "UPDATE "
 						+ " shipOrder SET"
 						+ " orderStatus = " + status + ", "
 						+ " statusShopConfirmed = " + status + " "
-						+ " where orderId = " + orderId + "";
+						+ " where orderId = " + orderId + ";";
 				stmt.executeUpdate(sql);
 			}
 			return true;
@@ -548,6 +548,81 @@ public class OrderDAO {
         }
         
         return result;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public static List<OrderInfo> getShipOrderFull(int offset, int numb) {
+		String sql = "SELECT * from shipOrder order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getShipOrderFull(String shipperUserName, int offset, int numb) {
+		
+		String sql = "SELECT * from shipOrder where shipperUserName = '" + shipperUserName + "' "
+				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getShipOrderFullByStatus(int orderStatus, int offset, int numb) {
+		String sql = "SELECT * from shipOrder where orderStatus = " + orderStatus
+				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getShipOrderFullByStatus(String shipperUserName, int orderStatus, int offset, int numb) {
+		String sql = "SELECT * from shipOrder where shipperUserName = '" + shipperUserName + "' "
+				+ " AND orderStatus = " + orderStatus 
+				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getShipOrderFullByUpdatedtime(String shipperUserName, int orderStatus, String startTime, String endTime) {
+		String sql = "SELECT * from shipOrder where shipperUserName = '" + shipperUserName + "' "
+				+ " AND orderStatus = " + orderStatus
+				+ " AND updated >= '" + startTime + "' AND updated <=  '" + endTime + "' "
+				+ "order by orderId desc";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getShipOrderFullByUpdatedtime(String shipUserName, String startTime, String endTime) {
+		String sql = "SELECT * from shipOrder where shipperUserName = '" + shipUserName + "' "
+				+ " AND updated >= '" + startTime + "' AND updated <=  '" + endTime + "' "
+				+ "order by orderId desc";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getShipOrderFullByUpdatedtime(int orderStatus, String startTime, String endTime) {
+		String sql = "SELECT * from shipOrder where orderStatus = " + orderStatus + " "
+				+ " AND updated >= '" + startTime + "' AND updated <=  '" + endTime + "' "
+				+ "order by orderId desc";
+		return getOrderFull(sql);
+	}
+	
+	public static List<OrderInfo> getShipOrderFullByUpdatedtime(String startTime, String endTime) {
+		String sql = "SELECT * from shipOrder where updated >= '" + startTime + "' AND updated <=  '" + endTime + "' "
+				+ "order by orderId desc";
+		return getOrderFull(sql);
 	}
 	
 

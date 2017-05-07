@@ -154,6 +154,9 @@ public class OrderLogic {
 				boolean r = OrderDAO.bidOrder(orderId, shipper.getShipperId(), shipper.getUserName(), shipper.getShipperName());
 
 				if (r) {
+					
+					OrderPush.pushOrder(order.getShopUserName(), order.getShipperUserName(), orderId, OrderInfo.order_bidded);
+					
 					result.put("status", Constant.status_ok);
 					
 					data.put("bidded", r);
@@ -232,11 +235,15 @@ public class OrderLogic {
 			OrderInfo order = orderList.get(0);
 			int status = order.getOrderStatus();
 			
-			if (status == OrderInfo.order_wait && order.getShopUserName().equals(shop.getUserName())) {
+			if ((status == OrderInfo.order_wait || status == OrderInfo.order_bidded) 
+					&& order.getShopUserName().equals(shop.getUserName())) {
 				// Update password
 				boolean r = OrderDAO.cancelOrder(orderId);
 
 				if (r) {
+					
+					OrderPush.pushOrder(order.getShopUserName(), order.getShipperUserName(), orderId, OrderInfo.order_cancel);
+					
 					result.put("status", Constant.status_ok);
 					
 					data.put("cancel", r);
@@ -427,6 +434,13 @@ public class OrderLogic {
 	}
 	
 	public static boolean checkUpdateStatus(int currentStatus, int updateStatus) {
+		if(updateStatus == OrderInfo.order_wait 
+				|| updateStatus == OrderInfo.order_bidded 
+				|| updateStatus == OrderInfo.order_cancel
+				|| currentStatus == OrderInfo.order_wait
+				|| currentStatus == OrderInfo.order_finish
+				|| currentStatus == OrderInfo.order_cancel)
+			return false;
 		
 		return true;
 	}
@@ -469,6 +483,9 @@ public class OrderLogic {
 		//boolean r2 = OrderDAO.confirmOrderStatus(orderId, orderStatus, role);
 
 		if(r1) {
+			
+			OrderPush.pushOrder(order.getShopUserName(), order.getShipperUserName(), orderId, orderStatus);
+			
 			result.put("status", Constant.status_ok);
 			result.put("data", data);
 
@@ -713,6 +730,117 @@ public class OrderLogic {
 		result.put("status", Constant.status_ok);
 
 		//data.put("orders", orderListToJSON(orders));
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public static JSONObject getShipperOrderFullByTime(String shipUserName, String startTime, String endTime) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		List<OrderInfo> orders;
+		if(shipUserName.length() == 0) {
+			orders = OrderDAO.getShipOrderFullByUpdatedtime(startTime, endTime);
+		} else {
+			orders = OrderDAO.getShipOrderFullByUpdatedtime(shipUserName, startTime, endTime);
+		}
+		result.put("status", Constant.status_ok);
+
+		data.put("orders", orderListToJSON(orders));
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	public static JSONObject getShipperOrderFullByTime(String shipUserName, int orderStatus, String startTime, String endTime) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		List<OrderInfo> orders;
+		if(shipUserName.length() == 0) {
+			orders = OrderDAO.getShipOrderFullByUpdatedtime(orderStatus, startTime, endTime);
+		} else {
+			orders = OrderDAO.getShipOrderFullByUpdatedtime(shipUserName, orderStatus, startTime, endTime);
+		}
+		result.put("status", Constant.status_ok);
+
+		data.put("orders", orderListToJSON(orders));
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+
+	
+	public static JSONObject getShipperOrderFullList(String shipUserName, int offset, int numb) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		List<OrderInfo> orders;
+		if(shipUserName.length() == 0) {
+			orders = OrderDAO.getShipOrderFull(offset, numb);
+		} else {
+			orders = OrderDAO.getShipOrderFull(shipUserName, offset, numb);
+		}
+		result.put("status", Constant.status_ok);
+
+		data.put("orders", orderListToJSON(orders));
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	public static JSONObject getShipperOrderFullList(String shipUserName, int orderStatus, int offset, int numb) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		List<OrderInfo> orders;
+		
+		if(shipUserName.length() == 0) {
+			orders = OrderDAO.getShipOrderFullByStatus(orderStatus, offset, numb);
+		} else {
+			orders = OrderDAO.getShipOrderFullByStatus(shipUserName, orderStatus, offset, numb);
+		}
+		
+		result.put("status", Constant.status_ok);
+
+		data.put("orders", orderListToJSON(orders));
 		result.put("data", data);
 
 		error.put("code", Constant.error_non);

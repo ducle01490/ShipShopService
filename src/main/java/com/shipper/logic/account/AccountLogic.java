@@ -11,10 +11,12 @@ import org.mindrot.BCrypt;
 
 import com.shipper.dao.SessionDAO;
 import com.shipper.dao.ShipperDAO;
+import com.shipper.dao.ShipperGeoDAO;
 import com.shipper.dao.ShopDAO;
 import com.shipper.logic.Constant;
 import com.shipper.model.SessionInfo;
 import com.shipper.model.Shipper;
+import com.shipper.model.ShipperGeo;
 import com.shipper.model.Shop;
 import com.shipper.model.User;
 
@@ -106,6 +108,23 @@ public class AccountLogic {
 
 		error.put("code", Constant.error_authen);
 		error.put("message", "sessionKey error");
+
+		result.put("error", error);
+
+		return result;
+	}
+	
+	
+	public static JSONObject genErrorSession(String message, int errorCode) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		result.put("status", Constant.status_error);
+		result.put("data", data);
+
+		error.put("code", errorCode);
+		error.put("message", message);
 
 		result.put("error", error);
 
@@ -969,8 +988,11 @@ public class AccountLogic {
 					bankInfo, facebook, zalo);
 
 			if (r) {
+				List<Shop> shops = ShopDAO.getShopByUserName(userName);
+				
 				result.put("status", Constant.status_ok);
-
+				
+				data.put("profile", shops.get(0).toJSON());
 				result.put("data", data);
 
 				error.put("code", Constant.error_non);
@@ -1015,8 +1037,10 @@ public class AccountLogic {
 					motorNumber, birthDay, address, idNumber);
 
 			if (r) {
+				List<Shipper> shippers = ShipperDAO.getShipperByUserName(userName);
+				
 				result.put("status", Constant.status_ok);
-
+				data.put("profile", shippers.get(0).toJSON());
 				result.put("data", data);
 
 				error.put("code", Constant.error_non);
@@ -1034,6 +1058,107 @@ public class AccountLogic {
 				result.put("error", error);
 			}
 		}
+
+		return result;
+	}
+	
+	public static JSONObject updateShipperGeo(String shipperUserName, String latitude, String longitude, String address) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		boolean checkShipper = checkShipperNull(shipperUserName);
+		if (checkShipper || shipperUserName == null || shipperUserName.length() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "userName not existed | userName is null");
+
+			result.put("error", error);
+
+			return result;
+		} else {
+			List<ShipperGeo> geoList = ShipperGeoDAO.getShipperGeoByUser(shipperUserName);
+			
+			if(geoList.size() == 0) {
+				boolean r = ShipperGeoDAO.createShipperGeo(shipperUserName, longitude, latitude, address);
+				if (r) {
+					result.put("status", Constant.status_ok);
+					result.put("data", data);
+
+					error.put("code", Constant.error_non);
+					error.put("message", "no error");
+
+					result.put("error", error);
+				} else {
+					result.put("status", Constant.status_error);
+
+					result.put("data", data);
+
+					error.put("code", Constant.error_db);
+					error.put("message", "error db");
+
+					result.put("error", error);
+				}
+			}
+			
+			boolean r = ShipperGeoDAO.updateShipperGeo(shipperUserName, longitude, latitude, address);
+
+			if (r) {
+				
+				result.put("status", Constant.status_ok);
+				result.put("data", data);
+
+				error.put("code", Constant.error_non);
+				error.put("message", "no error");
+
+				result.put("error", error);
+			} else {
+				result.put("status", Constant.status_error);
+
+				result.put("data", data);
+
+				error.put("code", Constant.error_db);
+				error.put("message", "error db");
+
+				result.put("error", error);
+			}
+		}
+
+		return result;
+	}
+	
+	public static JSONObject getShipperGeo(String shipperUserName) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		
+		List<ShipperGeo> geos = ShipperGeoDAO.getShipperGeoByUser(shipperUserName);
+		if (geos.size() == 0 || shipperUserName == null || shipperUserName.length() == 0) {
+				result.put("status", Constant.status_error);
+				result.put("data", data);
+
+				error.put("code", Constant.error_db);
+				error.put("message", "userName nnt existed | userName is null");
+
+				result.put("error", error);
+
+				return result;
+		} else {
+			ShipperGeo g = geos.get(0);
+				result.put("status", Constant.status_ok);
+
+				data.put("geo", g.toJSON());
+				result.put("data", data);
+
+				error.put("code", Constant.error_non);
+				error.put("message", "no error");
+
+				result.put("error", error);
+			}
+		
 
 		return result;
 	}

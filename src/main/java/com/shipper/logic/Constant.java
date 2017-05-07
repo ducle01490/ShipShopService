@@ -15,6 +15,7 @@ public class Constant {
 	public static final int error_order_null = 4;
 	
 	public static final int error_update_status = 6;
+	public static final int error_device_os = 7;
 
 	// JDBC driver name and database URL
 	public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
