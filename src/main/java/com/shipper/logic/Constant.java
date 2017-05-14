@@ -16,7 +16,8 @@ public class Constant {
 	
 	public static final int error_update_status = 6;
 	public static final int error_device_os = 7;
-
+	public static final int error_send_sms = 8;
+	public static final int error_phone = 8;
 	// JDBC driver name and database URL
 	public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	public static final String DB_URL = "jdbc:mysql://localhost/shipshop?useUnicode=true&characterEncoding=utf-8";

@@ -13,6 +13,8 @@ public class Shipper extends User {
 	private String address;
 	private String idNumber;
 	
+	
+	
 	private long preLoginTime;
 	private String preLoginDid;
 	private String preLoginGps;
@@ -61,8 +63,12 @@ public class Shipper extends User {
 		o.put("status", this.getStatus());
 		o.put("shipperName", this.getShipperName());
 		o.put("motorNumber", this.getMotorNumber());
+		o.put("address", this.getAddress());
 		o.put("birthDay", this.getBirthDay());
 		o.put("idNumber", this.getIdNumber());
+		
+		
+		
 		
 		return o;
 	}
@@ -142,6 +148,8 @@ public class Shipper extends User {
 	
 	
 	
+	
+
 	public static void main(String[] args) {
 		Date d = new Date();
 		System.out.println(d.getTime());

@@ -212,7 +212,8 @@ public class ShipperDAO {
 		return false;
 	}
 	
-	public static boolean updateShipperProfile(String userName, String shipperName, String motorNumber, String birthDay, String address, String idNumber) {
+	public static boolean updateShipperProfile(String userName, String shipperName, 
+			String motorNumber, String birthDay, String address, String idNumber) {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
@@ -230,6 +231,9 @@ public class ShipperDAO {
 					+ " birthday = '" + birthDay + "', "
 					+ " address = '" + address + "', "
 					+ " idNumber = '" + idNumber + "' "
+					
+					
+					
 					+ " where userName = '" + userName + "'";
 			
 		    stmt.executeUpdate(sql);
@@ -276,7 +280,10 @@ public class ShipperDAO {
 					+ " motorNumber = '" + shipper.getMotorNumber() + "', "
 					+ " birthday = '" + shipper.getBirthDay() + "', "
 					+ " address = '" + shipper.getAddress() + "', "
-					+ " idNumber = '" + shipper.getIdNumber() + "' "
+					+ " idNumber = '" + shipper.getIdNumber() + "', "
+					
+					
+					
 					+ " where userName = '" + shipper.getUserName() + "'";
 			
 		    stmt.executeUpdate(sql);

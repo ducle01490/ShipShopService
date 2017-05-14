@@ -11,37 +11,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.shipper.logic.Constant;
-import com.shipper.model.ShipperGeo;
+import com.shipper.model.CityGeo;
 
-public class ShipperGeoDAO {
-	
+public class GeoDAO {
 
-	public static List<ShipperGeo> getShipperGeoByUser(String shipperUserName) {
-		String sql = "SELECT * from shipperGeo where shipperUserName = '" + shipperUserName  + "'";
-		return getShipperGeo(sql);
+
+
+	public static List<CityGeo> getCityGeoList() {
+		String sql = "SELECT * from cityGeo order by id";
+		return getCityGeo(sql);
 	}
 	
-	public static ShipperGeo resultToShipperGeo(ResultSet rs) {
-		ShipperGeo geo = new ShipperGeo();
+	public static CityGeo resultToCityGeo(ResultSet rs) {
+		CityGeo city = new CityGeo();
 		try {
 			
-			
-			geo.setShipperUserName(rs.getString("shipperUserName"));
-			geo.setShipperUserName(rs.getString("latitude"));
-			geo.setShipperUserName(rs.getString("longitude"));
-			geo.setShipperUserName(rs.getString("address"));
-			geo.setUpdated(rs.getTimestamp("updated"));
+			city.setId(rs.getInt("id"));
+			city.setCity(rs.getString("city"));
+			city.setProvince(rs.getString("province"));
+			city.setDetail(rs.getString("detail"));
+			city.setUpdated(rs.getTimestamp("updated"));
 			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		return geo;
+		return city;
 	}
 	
-	public static List<ShipperGeo> getShipperGeo(String sql) {
-		List<ShipperGeo> result = new ArrayList<ShipperGeo>();
+	public static List<CityGeo> getCityGeo(String sql) {
+		List<CityGeo> result = new ArrayList<CityGeo>();
 		Connection conn = null;
 		Statement stmt = null;
         try {
@@ -51,8 +51,8 @@ public class ShipperGeoDAO {
             ResultSet rs;
             rs = stmt.executeQuery(sql);
             while ( rs.next() ) {
-            	ShipperGeo session = resultToShipperGeo(rs);
-                result.add(session);
+            	CityGeo city = resultToCityGeo(rs);
+                result.add(city);
             }
             conn.close();
         } catch (Exception e) {
@@ -66,7 +66,7 @@ public class ShipperGeoDAO {
 
 	
 
-	public static boolean updateShipperGeo(String shipperUserName, String longitude, String latitude, String address) {
+	public static boolean updateCityGeo(int id, String city, String province, String detail) {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
@@ -78,18 +78,18 @@ public class ShipperGeoDAO {
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
 		    
-		    String query = "update shipperGeo SET "
-						+ " longitude = ?, "
-						+ " latitude = ?, "
-						+ " address = ?, "
-						+ " updated = ? "
-						+ " where shipperUserName = ?;";
+		    String query = "update cityGeo SET "
+						+ " city = ?, "
+						+ " province = ?, "
+						+ " detail = ?, "
+						+ " updated = ?"
+						+ " where id = ?;";
 		    PreparedStatement preparedStmt = conn.prepareStatement(query);
-		    preparedStmt.setString (1, longitude);
-		    preparedStmt.setString (2, latitude);
-		    preparedStmt.setString (3, address);
+		    preparedStmt.setString (1, city);
+		    preparedStmt.setString (2, province);
+		    preparedStmt.setString (3, detail);
 		    preparedStmt.setTimestamp(4, timestamp);
-		    preparedStmt.setString (5, shipperUserName);
+		    preparedStmt.setInt (5, id);
 
 		    
 		    preparedStmt.execute();
@@ -117,7 +117,7 @@ public class ShipperGeoDAO {
 	
 	
 
-	public static boolean createShipperGeo(String shipperUserName, String longitude, String latitude, String address) {
+	public static boolean createCityGeo(String city, String province, String detail) {
 		
 		Connection conn = null;
 		Statement stmt = null;
@@ -130,14 +130,13 @@ public class ShipperGeoDAO {
 
 		    
 		    String query = "INSERT INTO "
-						+ " shipperGeo(shipperUserName, latitude, longitude, address, updated)"
-						+ " VALUES (?, ?, ?, ? , ?);";
+						+ " cityGeo(city, province, detail, updated)"
+						+ " VALUES (?, ?, ?, ?);";
 		    PreparedStatement preparedStmt = conn.prepareStatement(query);
-		    preparedStmt.setString (1, shipperUserName);
-		    preparedStmt.setString (2, latitude);
-		    preparedStmt.setString (3, longitude);
-		    preparedStmt.setString (4, address);
-		    preparedStmt.setTimestamp(5, timestamp);
+		    preparedStmt.setString (1, city);
+		    preparedStmt.setString (2, province);
+		    preparedStmt.setString (3, detail);
+		    preparedStmt.setTimestamp(4, timestamp);
 
 		    
 		    preparedStmt.execute();

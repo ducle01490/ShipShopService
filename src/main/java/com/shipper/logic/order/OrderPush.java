@@ -43,11 +43,11 @@ public class OrderPush {
 	
 	
 	public static void pushShipCancel(String shipperUserName, int orderId) {
-		pushUser(shipperUserName, User.role_shop, order_cancel, message(orderId, OrderInfo.order_cancel));
+		pushUser(shipperUserName, User.role_shipper, order_cancel, message(orderId, OrderInfo.order_cancel));
 	}
 	
 	public static void pushShipFinish(String shipperUserName, int orderId) {
-		pushUser(shipperUserName, User.role_shop, order_finish, message(orderId, OrderInfo.order_finish));
+		pushUser(shipperUserName, User.role_shipper, order_finish, message(orderId, OrderInfo.order_finish));
 	}
 	
 	public static String message(int orderId, int orderStatus) {

@@ -1,7 +1,6 @@
 package com.shipper.dao;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,13 +8,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import com.shipper.logic.Constant;
-import com.shipper.logic.Utils;
 import com.shipper.model.OrderInfo;
 import com.shipper.model.ShipperAggregate;
+import com.shipper.model.ShopAggregate;
 import com.shipper.model.User;
 
 public class OrderDAO {
@@ -114,33 +112,7 @@ public class OrderDAO {
 			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
 			stmt = conn.createStatement();
 
-//			String sql = "INSERT INTO "
-//					+ " shipOrder(orderId, orderTitle, shopId, shopUserName, shopName,"
-//					+ " receiveAddress, customerAddress, customerName, customerPhone,"
-//					+ " deliveryType, deliveryPrice, productPrice, noteTime, noteProduct,"
-//					+ " orderStatus, created"
-//					+ ")"
-//					+ " VALUES ("
-//					+ " " + orderId + ", "
-//					+ " '" + orderTitle + "', "
-//					+ " " + shopId + ", "
-//					+ " '" + shopUserName + "', "
-//					+ " '" + shopName + "', "
-//					
-//					+ " '" + receiveAddress + "', "
-//					+ " '" + customerAddress + "', "
-//					+ " '" + customerName + "', "
-//					+ " '" + customerPhone + "', "
-//					+ " " + deliveryType + ", "
-//					+ " " + deliveryPrice + ", "
-//					+ " " + productPrice + ", "
-//					+ " '" + noteTime + "', "
-//					+ " '" + noteProduct + "', "
-//					
-//					+ " " + OrderInfo.order_wait + " "
-//					
-//					+ ");";
-			
+
 			
 			// create a sql date object so we can use it in our INSERT statement
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -263,6 +235,41 @@ public class OrderDAO {
 						+ " where orderId = " + orderId + ";";
 				stmt.executeUpdate(sql);
 			}
+			return true;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					conn.close();
+			} catch (SQLException se) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	public static boolean updateOrderPaid(int orderId, long orderPaid) {
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+			stmt = conn.createStatement();
+			String sql = "UPDATE "
+					+ " shipOrder SET"
+					+ " orderPaid = " + orderPaid + " "
+					+ " where orderId = " + orderId + "";
+			stmt.executeUpdate(sql);
 			return true;
 		} catch (SQLException se) {
 			se.printStackTrace();
@@ -475,6 +482,8 @@ public class OrderDAO {
 			order.setDeliveryType(rs.getInt("deliveryType"));
 			order.setDeliveryPrice(rs.getLong("deliveryPrice"));
 			order.setProductPrice(rs.getLong("productPrice"));
+			order.setOrderPaid(rs.getLong("orderPaid"));
+			
 			order.setNoteTime(rs.getString("noteTime"));
 			order.setNoteProduct(rs.getString("noteProduct"));
 			
@@ -525,8 +534,8 @@ public class OrderDAO {
         return result;
     }
 	
-	public static List<ShipperAggregate> getAggregate() {
-		List<ShipperAggregate> result = new ArrayList<ShipperAggregate>();
+	public static long getAggregate(String sql) {
+		long result = 0;
 		Connection conn = null;
 		Statement stmt = null;
         try {
@@ -534,12 +543,9 @@ public class OrderDAO {
 			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
             stmt = conn.createStatement();
             ResultSet rs;
-            String sql = "";
             rs = stmt.executeQuery(sql);
             while ( rs.next() ) {
-            	ShipperAggregate aggregate = null;
-            	if(aggregate!=null)
-            		result.add(aggregate);
+            	result = rs.getLong(1);
             }
             conn.close();
         } catch (Exception e) {
@@ -550,6 +556,32 @@ public class OrderDAO {
         return result;
 	}
 	
+	public static ShipperAggregate shipperAggregate(String shipperUserName) {
+		long totalOrder = getAggregate(
+				"select count(*) from shipOrder where shipperUserName = '" + shipperUserName + "';"); 
+		long totalMoney = getAggregate(
+				"select  SUM(deliveryPrice) from shipOrder where shipperUserName = '" + shipperUserName + "';"); 
+		long productMoney = getAggregate(
+				"select  SUM(productPrice) from shipOrder where shipperUserName = '" + shipperUserName + "';"); 
+		
+		ShipperAggregate r = new ShipperAggregate(shipperUserName, totalOrder, totalMoney, productMoney);
+		return r;
+	}
+	
+	
+	public static ShopAggregate shopAggregate(String shopUserName) {
+		long totalOrder = getAggregate(
+				"select count(*) from shipOrder where shipperUserName = '" + shopUserName + "';"); 
+		long totalMoney = getAggregate(
+				"select  SUM(deliveryPrice) from shipOrder where shipperUserName = '" + shopUserName + "';"); 
+		long productMoney = getAggregate(
+				"select  SUM(productPrice) from shipOrder where shipperUserName = '" + shopUserName + "';"); 
+		long paidMoney = getAggregate(
+				"select  SUM(productPrice) from shipOrder where shipperUserName = '" + shopUserName + "';"); 
+		
+		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney);
+		return r;
+	}
 	
 	
 	

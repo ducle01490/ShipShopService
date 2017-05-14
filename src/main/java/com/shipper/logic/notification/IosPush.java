@@ -20,10 +20,10 @@ public class IosPush {
 	public static String pro_pass_shop = "123456789";
 	
 	
-	public static String dev_cert_ship = "Shipper_dev_Certificates.p12";
+	public static String dev_cert_ship = "shipper_1_new_certificates.p12";//"ship_new_certificates.p12"; //"Shipper_dev_Certificates.p12";//
 	public static String dev_pass_ship = "123456789";
 	
-	public static String pro_cert_ship = "Shipper_dev_Certificates.p12";
+	public static String pro_cert_ship = "shipper_1_new_certificates.p12";//"ship_new_certificates.p12";
 	public static String pro_pass_ship = "123456789";
 	
 	
@@ -34,8 +34,8 @@ public class IosPush {
 	public static void samplePush() {
 		List<String> tempRegis = new ArrayList<String>();
 		tempRegis.add("1");
-		tempRegis.add("7b0ab1564af0e9baa36572f44c48c7c8b5992c4de1cceefd9206a1f77be9a508");
-		sendPushList(initService(User.role_shop), tempRegis, "title", "message");
+		tempRegis.add("5e9658a80174a038ad408e60bcff60ad1e618089bda5fd09c9905e0c004b6b38");
+		sendPushList(initService(User.role_shipper), tempRegis, "title", "message");
 	}
 	
 	
@@ -48,6 +48,7 @@ public class IosPush {
 	
 	public static String pushIos(int role, String deviceToken, String title, String data) {
 		List<String> tokens = new ArrayList<String>();
+		//tokens.add("1");
 		tokens.add(deviceToken);
 		String notification = notification(title, data);
 		return pushIos(tokens, notification, role);
@@ -56,8 +57,10 @@ public class IosPush {
 	
 	public static String notification(String title, String message) {
 		String result = "{\"aps\":{\"alert\":\""+title+"\","
-				+"\"message\":\""+message+"\","
-				+ "\"badge\":0,\"sound\":\"default\"}}";
+				
+				+ "\"badge\":0,\"sound\":\"default\"}, "
+				+ "\"message\":"+message+""
+				+ "}";
 		
 		return result;
 	}
@@ -107,7 +110,7 @@ public class IosPush {
 		
 		} else {
 			if(dev_or_product) {
-				
+				System.out.println("init dev + role_ship");
 				ApnsService service = APNS
 						.newService()
 						.withCert(Thread.currentThread().getContextClassLoader().getResourceAsStream(dev_cert_ship), dev_pass_ship)
@@ -138,7 +141,7 @@ public class IosPush {
 		List<String> returnVl = new ArrayList<String>();
 		apnsService.push(tempRegis, 
 				"{\"aps\":{\"alert\":\""+title+"\","
-				+"\"message\":\""+message+"\","
+				+"\"message\":"+message+","
 				+ "\"badge\":0,\"sound\":\"default\"}}");
 		Map<String, Date> listInActive = apnsService.getInactiveDevices();
 		for(String str : listInActive.keySet()){

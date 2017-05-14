@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.shipper.logic.Constant;
+import com.shipper.logic.geo.GeoLogic;
 import com.shipper.model.Shop;
 import com.shipper.model.User;
 
@@ -50,6 +51,26 @@ public class ShopDAO {
 			shop.setBankInfo(rs.getString("bankInfo"));
 			shop.setFacebook(rs.getString("facebook"));
 			shop.setZalo(rs.getString("zalo"));
+			
+			
+			String city = rs.getString("city");
+			if(city == null) {
+				city = GeoLogic.hanoi;
+			}
+			String province = rs.getString("province");
+			if(province == null) {
+				province = GeoLogic.hanoi_provinces[0];
+			}
+			Integer id = rs.getInt("cityGeoId");
+			if(id == null) {
+				id = 1;
+			}
+			
+			shop.setCity(city);
+			shop.setProvince(province);
+			shop.setCityGeoId(id);
+			
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -80,7 +101,8 @@ public class ShopDAO {
         return result;
     }
 	
-	public static boolean updateShopProfile(String userName, String shopName, String address, String bankInfo, String facebook, String zalo) {
+	public static boolean updateShopProfile(String userName, String shopName, String address, String bankInfo, String facebook, String zalo,
+			String city, String province, int cityGeoId) {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
@@ -97,7 +119,12 @@ public class ShopDAO {
 					+ " address = '" + address + "', "
 					+ " bankInfo = '" + bankInfo + "', "
 					+ " facebook = '" + facebook + "', "
-					+ " zalo = '" + zalo + "' "
+					+ " zalo = '" + zalo + "', "
+					
+					+ " city = '" + city + "', "
+					+ " province = '" + province + "', "
+					+ " cityGeoId = '" + cityGeoId + "' "
+					
 					+ " where userName = '" + userName + "'";
 			
 		    stmt.executeUpdate(sql);
@@ -145,7 +172,12 @@ public class ShopDAO {
 					+ " address = '" + shop.getAddress() + "', "
 					+ " bankInfo = '" + shop.getBankInfo() + "', "
 					+ " facebook = '" + shop.getFacebook() + "', "
-					+ " zalo = '" + shop.getZalo() + "' "
+					+ " zalo = '" + shop.getZalo() + "', "
+					
+					+ " city = '" + shop.getCity() + "', "
+					+ " province = '" + shop.getProvince() + "', "
+					+ " cityGeoId = '" + shop.getCityGeoId() + "' "
+					
 					+ " where userName = '" + shop.getUserName() + "'";
 			
 		    stmt.executeUpdate(sql);

@@ -7,14 +7,18 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
 
+import com.shipper.dao.ConfigDAO;
 import com.shipper.dao.OrderDAO;
+import com.shipper.dao.OrderLogDAO;
 import com.shipper.dao.ShipperDAO;
 import com.shipper.dao.ShopDAO;
 import com.shipper.logic.Constant;
 import com.shipper.logic.account.AccountLogic;
 import com.shipper.model.OrderInfo;
 import com.shipper.model.Shipper;
+import com.shipper.model.ShipperAggregate;
 import com.shipper.model.Shop;
+import com.shipper.model.ShopAggregate;
 
 public class OrderLogic {
 	
@@ -218,7 +222,7 @@ public class OrderLogic {
 
 			return result;
 		} else {
-			List<OrderInfo> orderList = OrderDAO.getOrderInfoById(orderId);
+			List<OrderInfo> orderList = OrderDAO.getOrderFullById(orderId);
 			
 			if(orderList.size() == 0) {
 				result.put("status", Constant.status_error);
@@ -483,7 +487,7 @@ public class OrderLogic {
 		//boolean r2 = OrderDAO.confirmOrderStatus(orderId, orderStatus, role);
 
 		if(r1) {
-			
+			OrderLogDAO.logOrderStatus(orderId, orderStatus, role);
 			OrderPush.pushOrder(order.getShopUserName(), order.getShipperUserName(), orderId, orderStatus);
 			
 			result.put("status", Constant.status_ok);
@@ -508,6 +512,55 @@ public class OrderLogic {
 		
 	}
 	
+	
+	public static JSONObject updateOrderPaid(int orderId, long orderPaid, int role) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		List<OrderInfo> orders = OrderDAO.getOrderFullById(orderId);
+		
+		if(orders.size() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "order not existed");
+
+			result.put("error", error);
+
+			return result;
+		}
+		boolean r1 = OrderDAO.updateOrderPaid(orderId, orderPaid);
+
+		if(r1) {
+			OrderLogDAO.logOrderStatus(orderId, OrderInfo.order_paid, role);
+			
+			result.put("status", Constant.status_ok);
+			result.put("data", data);
+
+			error.put("code", Constant.error_non);
+			error.put("message", "no error");
+
+			result.put("error", error);
+			return result;
+		} else {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "order not existed");
+
+			result.put("error", error);
+
+			return result;
+		}
+		
+	}
+	
+	
+	
+	
 	public static JSONObject getOrderFull(int orderId) {
 		JSONObject result = new JSONObject();
 		JSONObject data = new JSONObject();
@@ -527,9 +580,13 @@ public class OrderLogic {
 			return result;
 		} else {
 			OrderInfo order = orders.get(0);
+			
+			
+			
 			result.put("status", Constant.status_ok);
-
-			data.put("order", order.fullToJSON());
+			
+			JSONObject d = orderShipShop(order);
+			data.put("order", d);
 			result.put("data", data);
 
 			error.put("code", Constant.error_non);
@@ -725,11 +782,11 @@ public class OrderLogic {
 			return result;
 		} 
 		
-		
+		ShipperAggregate a = OrderDAO.shipperAggregate(shipperUserName);
 		
 		result.put("status", Constant.status_ok);
 
-		//data.put("orders", orderListToJSON(orders));
+		data.put("count", a.toJSON());
 		result.put("data", data);
 
 		error.put("code", Constant.error_non);
@@ -742,7 +799,39 @@ public class OrderLogic {
 	}
 	
 	
-	
+	public static JSONObject getShopAggregate(String shopUserName) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		boolean checkNull = AccountLogic.checkShopNull(shopUserName);
+		if(checkNull || shopUserName.length() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "userName null");
+
+			result.put("error", error);
+
+			return result;
+		} 
+		
+		ShopAggregate a = OrderDAO.shopAggregate(shopUserName);
+		
+		result.put("status", Constant.status_ok);
+
+		data.put("count", a.toJSON());
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
 	
 	
 	
@@ -850,5 +939,21 @@ public class OrderLogic {
 		
 		
 		return result;
+	}
+	
+	
+	public static boolean updateConfig(String key, String value) {
+		return ConfigDAO.createUpdateConfig(key, value);
+	}
+	
+	public static JSONObject getConfig() {
+		JSONObject r = new JSONObject();
+	
+		Map<String, String> data = ConfigDAO.getConfig();
+		for(String key: data.keySet()) {
+			r.put(key, data.get(key));
+		}
+		
+		return r;
 	}
 }

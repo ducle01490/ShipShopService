@@ -12,8 +12,11 @@ import org.mindrot.BCrypt;
 import com.shipper.dao.SessionDAO;
 import com.shipper.dao.ShipperDAO;
 import com.shipper.dao.ShipperGeoDAO;
+import com.shipper.dao.ShipperProvinceDAO;
 import com.shipper.dao.ShopDAO;
 import com.shipper.logic.Constant;
+import com.shipper.logic.geo.GeoLogic;
+import com.shipper.model.CityGeo;
 import com.shipper.model.SessionInfo;
 import com.shipper.model.Shipper;
 import com.shipper.model.ShipperGeo;
@@ -555,17 +558,52 @@ public class AccountLogic {
 				return result;
 			} else {
 				String code = genShopCode(userName);
-				data.put("code", code);
+				
+				Shop user = ShopDAO.getShopByUserName(userName).get(0);
+				String phoneNumber = user.getPhoneNumber();
+				if(phoneNumber != "") {
+					boolean smsResult = SmsLogic.sendSms(phoneNumber, code);
+					if(smsResult) {
+						data.put("code", code);
+						data.put("sms", smsResult);
+	
+						result.put("status", Constant.status_ok);
+						result.put("data", data);
+	
+						error.put("code", Constant.error_non);
+						error.put("message", "no error");
+	
+						result.put("error", error);
+	
+						return result;
+					} else {
+						data.put("code", code);
+						data.put("sms", smsResult);
+	
+						result.put("status", Constant.status_error);
+						result.put("data", data);
+	
+						error.put("code", Constant.error_send_sms);
+						error.put("message", "error sending sms");
+	
+						result.put("error", error);
+	
+						return result;
+					}
+				} else {
+					data.put("code", code);
 
-				result.put("status", Constant.status_ok);
-				result.put("data", data);
+					result.put("status", Constant.status_error);
+					result.put("data", data);
 
-				error.put("code", Constant.error_non);
-				error.put("message", "no error");
+					error.put("code", Constant.error_phone);
+					error.put("message", "error phone number");
 
-				result.put("error", error);
+					result.put("error", error);
 
-				return result;
+					return result;
+				}
+				
 			}
 
 		} else if (userType == User.role_shipper) {
@@ -738,6 +776,9 @@ public class AccountLogic {
 
 		return result;
 	}
+	
+	
+	
 
 	public static JSONObject updatePhone(String userName, String phoneNumber,
 			int userType) {
@@ -762,16 +803,33 @@ public class AccountLogic {
 
 				if (r) {
 					String code = genShopCode(userName);
-					data.put("code", code);
-
-					result.put("status", Constant.status_ok);
-
-					result.put("data", data);
-
-					error.put("code", Constant.error_non);
-					error.put("message", "no error");
-
-					result.put("error", error);
+					
+					boolean smsResult = SmsLogic.sendSms(phoneNumber, code);
+					if(smsResult) {
+						data.put("code", code);
+						data.put("sms", smsResult);
+	
+						result.put("status", Constant.status_ok);
+	
+						result.put("data", data);
+	
+						error.put("code", Constant.error_non);
+						error.put("message", "no error");
+	
+						result.put("error", error);
+					} else {
+						data.put("code", code);
+						data.put("sms", smsResult);
+	
+						result.put("status", Constant.status_error);
+	
+						result.put("data", data);
+	
+						error.put("code", Constant.error_send_sms);
+						error.put("message", "no error");
+	
+						result.put("error", error);
+					}
 				} else {
 					result.put("status", Constant.status_error);
 
@@ -801,16 +859,33 @@ public class AccountLogic {
 
 				if (r) {
 					String code = genShipCode(userName);
-					data.put("code", code);
+					
+					boolean smsCode = SmsLogic.sendSms(phoneNumber, code);
+					if(smsCode) {
+						data.put("code", code);
+						data.put("sms", smsCode);
+	
+						result.put("status", Constant.status_ok);
+	
+						result.put("data", data);
+	
+						error.put("code", Constant.error_non);
+						error.put("message", "no error");
+	
+						result.put("error", error);
+					} else {
+						data.put("code", code);
+						data.put("sms", smsCode);
 
-					result.put("status", Constant.status_ok);
+						result.put("status", Constant.status_error);
 
-					result.put("data", data);
+						result.put("data", data);
 
-					error.put("code", Constant.error_non);
-					error.put("message", "no error");
+						error.put("code", Constant.error_send_sms);
+						error.put("message", "no error");
 
-					result.put("error", error);
+						result.put("error", error);
+					}
 				} else {
 					result.put("status", Constant.status_error);
 
@@ -967,7 +1042,7 @@ public class AccountLogic {
 
 	public static JSONObject updateShopProfile(String userName,
 			String shopName, String address, String bankInfo, String facebook,
-			String zalo) {
+			String zalo, String city, String province, int cityGeoId) {
 		JSONObject result = new JSONObject();
 		JSONObject data = new JSONObject();
 		JSONObject error = new JSONObject();
@@ -985,7 +1060,7 @@ public class AccountLogic {
 			return result;
 		} else {
 			boolean r = ShopDAO.updateShopProfile(userName, shopName, address,
-					bankInfo, facebook, zalo);
+					bankInfo, facebook, zalo, city, province, cityGeoId);
 
 			if (r) {
 				List<Shop> shops = ShopDAO.getShopByUserName(userName);
@@ -1151,6 +1226,86 @@ public class AccountLogic {
 				result.put("status", Constant.status_ok);
 
 				data.put("geo", g.toJSON());
+				result.put("data", data);
+
+				error.put("code", Constant.error_non);
+				error.put("message", "no error");
+
+				result.put("error", error);
+			}
+		
+
+		return result;
+	}
+	
+	
+	
+	public static JSONObject updateShipperProvince(String shipperUserName, int geoId, String city, String province, String detail) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		boolean checkShipper = checkShipperNull(shipperUserName);
+		if (checkShipper || shipperUserName == null || shipperUserName.length() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "userName not existed | userName is null");
+
+			result.put("error", error);
+
+			return result;
+		} else {
+			boolean r = ShipperProvinceDAO.createCityGeo(shipperUserName, geoId, city, province, detail);
+			if (r) {
+					result.put("status", Constant.status_ok);
+					result.put("data", data);
+
+					error.put("code", Constant.error_non);
+					error.put("message", "no error");
+
+					result.put("error", error);
+			} else {
+					result.put("status", Constant.status_error);
+
+					result.put("data", data);
+
+					error.put("code", Constant.error_db);
+					error.put("message", "error db");
+
+					result.put("error", error);
+			}
+			
+			
+			
+		}
+
+		return result;
+	}
+	
+	public static JSONObject getShipperProvince(String shipperUserName) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		
+		List<CityGeo> geos = ShipperProvinceDAO.getCityGeoByUser(shipperUserName);
+		if (geos.size() == 0 || shipperUserName == null || shipperUserName.length() == 0) {
+				result.put("status", Constant.status_error);
+				result.put("data", data);
+
+				error.put("code", Constant.error_db);
+				error.put("message", "userName nnt existed | userName is null");
+
+				result.put("error", error);
+
+				return result;
+		} else {
+			
+				result.put("status", Constant.status_ok);
+
+				data.put("geo", GeoLogic.getJSONCity(geos));
 				result.put("data", data);
 
 				error.put("code", Constant.error_non);

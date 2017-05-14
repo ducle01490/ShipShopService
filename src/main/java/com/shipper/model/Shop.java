@@ -13,6 +13,10 @@ public class Shop extends User{
 	
 	private String bankInfo;
 	
+	private String city;
+	private String province;
+	private int cityGeoId;
+	
 	
 	public Shop(String userName, String password) {
 		super(userName, password, User.role_shop);
@@ -41,6 +45,10 @@ public class Shop extends User{
 		o.put("bankInfo", this.getBankInfo());
 		o.put("facebook", this.getFacebook());
 		o.put("zalo", this.getZalo());
+		
+		o.put("city", this.getCity());
+		o.put("province", this.getProvince());
+		o.put("cityGeoId", this.getCityGeoId());
 		
 		return o;
 	}
@@ -98,22 +106,38 @@ public class Shop extends User{
 	public void setZalo(String zalo) {
 		this.zalo = zalo;
 	}
-
-
-
-
 	public String getBankInfo() {
 		return bankInfo;
 	}
-
-
-
 
 	public void setBankInfo(String bankInfo) {
 		this.bankInfo = bankInfo;
 	}
 
 
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	public int getCityGeoId() {
+		return cityGeoId;
+	}
+
+	public void setCityGeoId(int cityGeoId) {
+		this.cityGeoId = cityGeoId;
+	}
 	
 	
 	

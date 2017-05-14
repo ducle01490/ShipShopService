@@ -2,31 +2,27 @@ package com.shipper.model;
 
 import org.json.JSONObject;
 
-public class ShipperAggregate {
-	
-	private String shipperUsername;
+public class ShopAggregate {
+	private String shopUserName;
 	private long totalOrder;
 	private long totalMoney;
 	private long productMoney;
+	private long paidMoney;
 	
 	
 	
 	
 	
-	public ShipperAggregate(String shipperUsername, long totalOrder,
-			long totalMoney, long productMoney) {
+	public ShopAggregate(String shopUserName, long totalOrder,
+			long totalMoney, long productMoney, long paidMoney) {
 		super();
-		this.shipperUsername = shipperUsername;
+		this.setShopUserName(shopUserName);
 		this.totalOrder = totalOrder;
 		this.totalMoney = totalMoney;
 		this.productMoney = productMoney;
+		this.setPaidMoney(paidMoney);
 	}
-	public String getShipperUsername() {
-		return shipperUsername;
-	}
-	public void setShipperUsername(String shipperUsername) {
-		this.shipperUsername = shipperUsername;
-	}
+	
 	public long getTotalOrder() {
 		return totalOrder;
 	}
@@ -44,10 +40,11 @@ public class ShipperAggregate {
 	public JSONObject toJSON() {
 		JSONObject o = new JSONObject();
 		
-		o.put("shipperUserName", this.getShipperUsername());
+		o.put("shopUserName", this.getShopUserName());
 		o.put("totalOrder", this.getTotalOrder());
 		o.put("totalMoney", this.getTotalMoney());
 		o.put("productMoney", this.getProductMoney());
+		o.put("paidMoney", this.getPaidMoney());
 		
 		return o;
 	}
@@ -56,6 +53,22 @@ public class ShipperAggregate {
 	}
 	public void setProductMoney(long productMoney) {
 		this.productMoney = productMoney;
+	}
+
+	public String getShopUserName() {
+		return shopUserName;
+	}
+
+	public void setShopUserName(String shopUserName) {
+		this.shopUserName = shopUserName;
+	}
+
+	public long getPaidMoney() {
+		return paidMoney;
+	}
+
+	public void setPaidMoney(long paidMoney) {
+		this.paidMoney = paidMoney;
 	}
 	
 

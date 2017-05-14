@@ -10,6 +10,7 @@ public class OrderInfo {
 	public static final int order_finish = 4;
 	public static final int order_cancel = 5;
 	public static final int order_error = 6;
+	public static final int order_paid = 7;
 	
 	
 	private int orderId;
@@ -27,6 +28,7 @@ public class OrderInfo {
 	private int deliveryType;
 	private long deliveryPrice;
 	private long productPrice;
+	private long orderPaid;
 	
 	private String noteTime;
 	private String noteProduct;
@@ -111,6 +113,7 @@ public class OrderInfo {
 		o.put("deliveryType", this.getDeliveryType());
 		o.put("deliveryPrice", this.getDeliveryPrice());
 		o.put("productPrice", this.getProductPrice());
+		o.put("paidMoney", this.getOrderPaid());
 		o.put("noteTime", this.getNoteTime());
 		o.put("noteProduct", this.getNoteProduct());
 		
@@ -278,6 +281,12 @@ public class OrderInfo {
 	}
 	public void setUpdated(String updated) {
 		this.updated = updated;
+	}
+	public long getOrderPaid() {
+		return orderPaid;
+	}
+	public void setOrderPaid(long orderPaid) {
+		this.orderPaid = orderPaid;
 	}
 
 }
