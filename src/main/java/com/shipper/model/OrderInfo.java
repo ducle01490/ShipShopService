@@ -113,7 +113,7 @@ public class OrderInfo {
 		o.put("deliveryType", this.getDeliveryType());
 		o.put("deliveryPrice", this.getDeliveryPrice());
 		o.put("productPrice", this.getProductPrice());
-		o.put("paidMoney", this.getOrderPaid());
+		o.put("orderPaid", this.getOrderPaid());
 		o.put("noteTime", this.getNoteTime());
 		o.put("noteProduct", this.getNoteProduct());
 		

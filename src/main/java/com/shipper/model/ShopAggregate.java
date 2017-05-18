@@ -5,7 +5,7 @@ import org.json.JSONObject;
 public class ShopAggregate {
 	private String shopUserName;
 	private long totalOrder;
-	private long totalMoney;
+	private long shipMoney;
 	private long productMoney;
 	private long paidMoney;
 	
@@ -14,11 +14,11 @@ public class ShopAggregate {
 	
 	
 	public ShopAggregate(String shopUserName, long totalOrder,
-			long totalMoney, long productMoney, long paidMoney) {
+			long shipMoney, long productMoney, long paidMoney) {
 		super();
 		this.setShopUserName(shopUserName);
 		this.totalOrder = totalOrder;
-		this.totalMoney = totalMoney;
+		this.shipMoney = shipMoney;
 		this.productMoney = productMoney;
 		this.setPaidMoney(paidMoney);
 	}
@@ -29,12 +29,7 @@ public class ShopAggregate {
 	public void setTotalOrder(int totalOrder) {
 		this.totalOrder = totalOrder;
 	}
-	public long getTotalMoney() {
-		return totalMoney;
-	}
-	public void setTotalMoney(int totalMoney) {
-		this.totalMoney = totalMoney;
-	}
+
 
 	
 	public JSONObject toJSON() {
@@ -42,7 +37,7 @@ public class ShopAggregate {
 		
 		o.put("shopUserName", this.getShopUserName());
 		o.put("totalOrder", this.getTotalOrder());
-		o.put("totalMoney", this.getTotalMoney());
+		o.put("shipMoney", this.getShipMoney());
 		o.put("productMoney", this.getProductMoney());
 		o.put("paidMoney", this.getPaidMoney());
 		
@@ -69,6 +64,14 @@ public class ShopAggregate {
 
 	public void setPaidMoney(long paidMoney) {
 		this.paidMoney = paidMoney;
+	}
+
+	public long getShipMoney() {
+		return shipMoney;
+	}
+
+	public void setShipMoney(long shipMoney) {
+		this.shipMoney = shipMoney;
 	}
 	
 

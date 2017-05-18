@@ -659,16 +659,16 @@ public class OrderLogic {
 	}
 	
 	
-	public static JSONObject getOrderFullByTime(String shopUserName, String startTime, String endTime) {
+	public static JSONObject getOrderFullByTime(String shopUserName, String startTime, String endTime, int offset, int numb) {
 		JSONObject result = new JSONObject();
 		JSONObject data = new JSONObject();
 		JSONObject error = new JSONObject();
 
 		List<OrderInfo> orders;
 		if(shopUserName.length() == 0) {
-			orders = OrderDAO.getOrderFullByUpdatedtime(startTime, endTime);
+			orders = OrderDAO.getOrderFullByUpdatedtime(startTime, endTime, offset, numb);
 		} else {
-			orders = OrderDAO.getShopOrderFullByUpdatedtime(shopUserName, startTime, endTime);
+			orders = OrderDAO.getShopOrderFullByUpdatedtime(shopUserName, startTime, endTime, offset, numb);
 		}
 		result.put("status", Constant.status_ok);
 
@@ -684,16 +684,16 @@ public class OrderLogic {
 		return result;
 	}
 	
-	public static JSONObject getOrderFullByTime(String shopUserName, int orderStatus, String startTime, String endTime) {
+	public static JSONObject getOrderFullByTime(String shopUserName, int orderStatus, String startTime, String endTime, int offset, int numb) {
 		JSONObject result = new JSONObject();
 		JSONObject data = new JSONObject();
 		JSONObject error = new JSONObject();
 
 		List<OrderInfo> orders;
 		if(shopUserName.length() == 0) {
-			orders = OrderDAO.getOrderFullByUpdatedtime(orderStatus, startTime, endTime);
+			orders = OrderDAO.getOrderFullByUpdatedtime(orderStatus, startTime, endTime, offset, numb);
 		} else {
-			orders = OrderDAO.getShopOrderFullByUpdatedtime(shopUserName, orderStatus, startTime, endTime);
+			orders = OrderDAO.getShopOrderFullByUpdatedtime(shopUserName, orderStatus, startTime, endTime, offset, numb);
 		}
 		result.put("status", Constant.status_ok);
 
@@ -764,7 +764,7 @@ public class OrderLogic {
 	
 	
 	
-	public static JSONObject getShipperAggregate(String shipperUserName) {
+	public static JSONObject getShipperAggregate(String shipperUserName, int orderStatus) {
 		JSONObject result = new JSONObject();
 		JSONObject data = new JSONObject();
 		JSONObject error = new JSONObject();
@@ -781,8 +781,12 @@ public class OrderLogic {
 
 			return result;
 		} 
-		
-		ShipperAggregate a = OrderDAO.shipperAggregate(shipperUserName);
+		ShipperAggregate a;
+		if(orderStatus == -1) {
+			a = OrderDAO.shipperAggregate(shipperUserName);
+		} else {
+			a = OrderDAO.shipperAggregate(shipperUserName, orderStatus);
+		}
 		
 		result.put("status", Constant.status_ok);
 
@@ -799,7 +803,7 @@ public class OrderLogic {
 	}
 	
 	
-	public static JSONObject getShopAggregate(String shopUserName) {
+	public static JSONObject getShopAggregate(String shopUserName, int orderStatus) {
 		JSONObject result = new JSONObject();
 		JSONObject data = new JSONObject();
 		JSONObject error = new JSONObject();
@@ -817,8 +821,12 @@ public class OrderLogic {
 			return result;
 		} 
 		
-		ShopAggregate a = OrderDAO.shopAggregate(shopUserName);
-		
+		ShopAggregate a; 
+		if(orderStatus == -1) {
+			a = OrderDAO.shopAggregate(shopUserName);
+		} else {
+			a = OrderDAO.shopAggregate(shopUserName, orderStatus);
+		}
 		result.put("status", Constant.status_ok);
 
 		data.put("count", a.toJSON());
@@ -839,16 +847,16 @@ public class OrderLogic {
 	
 	
 	
-	public static JSONObject getShipperOrderFullByTime(String shipUserName, String startTime, String endTime) {
+	public static JSONObject getShipperOrderFullByTime(String shipUserName, String startTime, String endTime, int offset, int numb) {
 		JSONObject result = new JSONObject();
 		JSONObject data = new JSONObject();
 		JSONObject error = new JSONObject();
 
 		List<OrderInfo> orders;
 		if(shipUserName.length() == 0) {
-			orders = OrderDAO.getShipOrderFullByUpdatedtime(startTime, endTime);
+			orders = OrderDAO.getShipOrderFullByUpdatedtime(startTime, endTime, offset, numb);
 		} else {
-			orders = OrderDAO.getShipOrderFullByUpdatedtime(shipUserName, startTime, endTime);
+			orders = OrderDAO.getShipOrderFullByUpdatedtime(shipUserName, startTime, endTime, offset, numb);
 		}
 		result.put("status", Constant.status_ok);
 
@@ -864,16 +872,17 @@ public class OrderLogic {
 		return result;
 	}
 	
-	public static JSONObject getShipperOrderFullByTime(String shipUserName, int orderStatus, String startTime, String endTime) {
+	public static JSONObject getShipperOrderFullByTime(String shipUserName, int orderStatus, String startTime, String endTime,
+			int offset, int numb) {
 		JSONObject result = new JSONObject();
 		JSONObject data = new JSONObject();
 		JSONObject error = new JSONObject();
 
 		List<OrderInfo> orders;
 		if(shipUserName.length() == 0) {
-			orders = OrderDAO.getShipOrderFullByUpdatedtime(orderStatus, startTime, endTime);
+			orders = OrderDAO.getShipOrderFullByUpdatedtime(orderStatus, startTime, endTime, offset, numb);
 		} else {
-			orders = OrderDAO.getShipOrderFullByUpdatedtime(shipUserName, orderStatus, startTime, endTime);
+			orders = OrderDAO.getShipOrderFullByUpdatedtime(shipUserName, orderStatus, startTime, endTime, offset, numb);
 		}
 		result.put("status", Constant.status_ok);
 
