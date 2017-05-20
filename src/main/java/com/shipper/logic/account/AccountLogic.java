@@ -1296,7 +1296,7 @@ public class AccountLogic {
 				result.put("data", data);
 
 				error.put("code", Constant.error_db);
-				error.put("message", "userName nnt existed | userName is null");
+				error.put("message", "userName not existed | userName is null");
 
 				result.put("error", error);
 

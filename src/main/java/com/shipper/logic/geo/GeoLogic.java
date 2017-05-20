@@ -116,8 +116,8 @@ public class GeoLogic {
 		data.put("cityGeo", a);
 		result.put("data", data);
 
-		error.put("code", Constant.error_authen);
-		error.put("message", "sessionKey error");
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
 
 		result.put("error", error);
 

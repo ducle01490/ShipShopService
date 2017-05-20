@@ -841,6 +841,199 @@ public class OrderLogic {
 		return result;
 	}
 	
+	public static JSONObject getShipperAggregateByTime(String shipperUserName, int orderStatus, String startTime, String endTime) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		boolean checkNull = AccountLogic.checkShipperNull(shipperUserName);
+		if(checkNull || shipperUserName.length() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "userName null");
+
+			result.put("error", error);
+
+			return result;
+		} 
+		ShipperAggregate a;
+		if(orderStatus == -1) {
+			a = OrderDAO.shipperAggregate(shipperUserName, startTime, endTime);
+		} else {
+			a = OrderDAO.shipperAggregate(shipperUserName, orderStatus, startTime, endTime);
+		}
+		
+		result.put("status", Constant.status_ok);
+
+		data.put("count", a.toJSON());
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	
+	public static JSONObject getShopAggregateByTime(String shopUserName, int orderStatus, String startTime, String endTime) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		boolean checkNull = AccountLogic.checkShopNull(shopUserName);
+		if(checkNull || shopUserName.length() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "userName null");
+
+			result.put("error", error);
+
+			return result;
+		} 
+		
+		ShopAggregate a; 
+		if(orderStatus == -1) {
+			a = OrderDAO.shopAggregate(shopUserName, startTime, endTime);
+		} else {
+			a = OrderDAO.shopAggregate(shopUserName, orderStatus, startTime, endTime);
+		}
+		result.put("status", Constant.status_ok);
+
+		data.put("count", a.toJSON());
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+
+
+	
+	
+	public static JSONObject getDateAggregate(int orderStatus, String startTime, String endTime) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		Map<String, Long> a;
+		if(orderStatus == -1) {
+			a = OrderDAO.orderDateAggregate(startTime, endTime);
+		} else {
+			a = OrderDAO.orderDateAggregate(orderStatus, startTime, endTime);
+		}
+		result.put("status", Constant.status_ok);
+		data.put("count", mapToJSON(a));
+		result.put("data", data);
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+		result.put("error", error);
+		
+		return result;
+	}
+	
+	
+	
+	public static JSONObject getShipperDateAggregate(String shipperUserName, int orderStatus, String startTime, String endTime) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		boolean checkNull = AccountLogic.checkShipperNull(shipperUserName);
+		if(checkNull || shipperUserName.length() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+			error.put("code", Constant.error_db);
+			error.put("message", "userName null");
+			result.put("error", error);
+
+			return result;
+		} 
+		Map<String, Long> a;
+		if(orderStatus == -1) {
+			a = OrderDAO.orderShipperDateAggregate(shipperUserName, startTime, endTime);
+		} else {
+			a = OrderDAO.orderShipperDateAggregate(shipperUserName, orderStatus, startTime, endTime);
+		}
+		
+		result.put("status", Constant.status_ok);
+		data.put("count", mapToJSON(a));
+		result.put("data", data);
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+		result.put("error", error);	
+		
+		return result;
+	}
+	
+	
+	public static JSONObject getShopDateAggregate(String shopUserName, int orderStatus, String startTime, String endTime) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		boolean checkNull = AccountLogic.checkShopNull(shopUserName);
+		if(checkNull || shopUserName.length() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+			error.put("code", Constant.error_db);
+			error.put("message", "userName null");
+			result.put("error", error);
+
+			return result;
+		} 
+		
+		Map<String, Long> a; 
+		if(orderStatus == -1) {
+			a = OrderDAO.orderShopDateAggregate(shopUserName, startTime, endTime);
+		} else {
+			a = OrderDAO.orderShopDateAggregate(shopUserName, orderStatus, startTime, endTime);
+		}
+		result.put("status", Constant.status_ok);
+		data.put("count", mapToJSON(a));
+		result.put("data", data);
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public static JSONArray mapToJSON(Map<String, Long> map) {
+		JSONArray o = new JSONArray();
+		
+		for(String key : map.keySet()) {
+			JSONObject a = new JSONObject();
+			a.put("date", key);
+			a.put("count", map.get(key));
+			
+			o.add(a);
+		}
+		
+		return o;
+	}
+	
+	
+	
 	
 	
 	
