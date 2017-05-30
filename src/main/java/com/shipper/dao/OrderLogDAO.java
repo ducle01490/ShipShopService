@@ -61,5 +61,56 @@ public class OrderLogDAO {
 		return false;
 	}
 	
+	
+	
+	public static boolean logOrderUpdate(int orderId, String feature, String logValue, int role) {
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+			stmt = conn.createStatement();
+
+
+			
+			// create a sql date object so we can use it in our INSERT statement
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+		    // the mysql insert statement
+		    String query = "INSERT INTO "
+						+ " orderUpdateLog(orderId, feature, logValue, role, created)"
+						+ " VALUES (?, ?, ?, ?, ?);";
+		    PreparedStatement preparedStmt = conn.prepareStatement(query);
+		    preparedStmt.setInt (1, orderId);
+		    preparedStmt.setString (2, feature);
+		    preparedStmt.setString (3, logValue);
+		    preparedStmt.setInt (4, role);
+		    preparedStmt.setTimestamp(5, timestamp);
+
+		    preparedStmt.execute();
+			
+			return true;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					conn.close();
+			} catch (SQLException se) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
+	
 
 }

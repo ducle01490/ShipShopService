@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.shipper.logic.Constant;
+import com.shipper.model.OrderAggregate;
 import com.shipper.model.OrderInfo;
 import com.shipper.model.ShipperAggregate;
 import com.shipper.model.ShopAggregate;
@@ -258,6 +259,42 @@ public class OrderDAO {
 		
 		return false;
 	}
+	
+	
+	public static boolean updateProductPrice(int orderId, long productPrice) {
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+			stmt = conn.createStatement();
+			String sql = "UPDATE "
+					+ " shipOrder SET"
+					+ " productPrice = " + productPrice + " "
+					+ " where orderId = " + orderId + "";
+			stmt.executeUpdate(sql);
+			return true;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					conn.close();
+			} catch (SQLException se) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
+	
 	
 	
 	public static boolean updateOrderPaid(int orderId, long orderPaid) {
@@ -566,7 +603,7 @@ public class OrderDAO {
 		long productMoney = getAggregate(
 				"select  SUM(productPrice) from shipOrder where shipperUserName = '" + shipperUserName + "';"); 
 		long paidMoney = getAggregate(
-				"select  SUM(paidMoney) from shipOrder where shipperUserName = '" + shipperUserName + "';"); 
+				"select  SUM(orderPaid) from shipOrder where shipperUserName = '" + shipperUserName + "';"); 
 		
 		ShipperAggregate r = new ShipperAggregate(shipperUserName, totalOrder, totalMoney, productMoney, paidMoney);
 		return r;
@@ -581,7 +618,7 @@ public class OrderDAO {
 		long productMoney = getAggregate(
 				"select  SUM(productPrice) from shipOrder where shopUserName = '" + shopUserName + "';"); 
 		long paidMoney = getAggregate(
-				"select  SUM(paidMoney) from shipOrder where shopUserName = '" + shopUserName + "';"); 
+				"select  SUM(orderPaid) from shipOrder where shopUserName = '" + shopUserName + "';"); 
 		
 		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney);
 		return r;
@@ -596,7 +633,7 @@ public class OrderDAO {
 		long productMoney = getAggregate(
 				"select  SUM(productPrice) from shipOrder where shipperUserName = '" + shipperUserName + "' and orderStatus = " + orderStatus + ";"); 
 		long paidMoney = getAggregate(
-				"select  SUM(paidMoney) from shipOrder where shipperUserName = '" + shipperUserName + "' and orderStatus = " + orderStatus + ";"); 
+				"select  SUM(orderPaid) from shipOrder where shipperUserName = '" + shipperUserName + "' and orderStatus = " + orderStatus + ";"); 
 		
 		ShipperAggregate r = new ShipperAggregate(shipperUserName, totalOrder, totalMoney, productMoney, paidMoney);
 		return r;
@@ -611,7 +648,7 @@ public class OrderDAO {
 		long productMoney = getAggregate(
 				"select  SUM(productPrice) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + orderStatus + ";"); 
 		long paidMoney = getAggregate(
-				"select  SUM(paidMoney) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + orderStatus + ";"); 
+				"select  SUM(orderPaid) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + orderStatus + ";"); 
 		
 		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney);
 		return r;
@@ -632,7 +669,7 @@ public class OrderDAO {
 				+ "shipperUserName = '" + shipperUserName + "' and orderStatus = " + orderStatus 
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		long paidMoney = getAggregate(
-				"select  SUM(paidMoney) from shipOrder where "
+				"select  SUM(orderPaid) from shipOrder where "
 				+ "shipperUserName = '" + shipperUserName + "' and orderStatus = " + orderStatus 
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;"); 
 		
@@ -655,7 +692,7 @@ public class OrderDAO {
 				+ "shopUserName = '" + shopUserName + "' and orderStatus = " + orderStatus 
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		long paidMoney = getAggregate(
-				"select  SUM(paidMoney) from shipOrder where "
+				"select  SUM(orderPaid) from shipOrder where "
 				+ "shopUserName = '" + shopUserName + "' and orderStatus = " + orderStatus 
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		
@@ -677,7 +714,7 @@ public class OrderDAO {
 				+ "shipperUserName = '" + shipperUserName + "' "
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		long paidMoney = getAggregate(
-				"select  SUM(paidMoney) from shipOrder where "
+				"select  SUM(orderPaid) from shipOrder where "
 				+ "shipperUserName = '" + shipperUserName + "' "
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;"); 
 		
@@ -700,7 +737,7 @@ public class OrderDAO {
 				+ "shopUserName = '" + shopUserName + "' and "
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		long paidMoney = getAggregate(
-				"select  SUM(paidMoney) from shipOrder where "
+				"select  SUM(orderPaid) from shipOrder where "
 				+ "shopUserName = '" + shopUserName + "' "
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		
@@ -710,8 +747,33 @@ public class OrderDAO {
 	
 	
 	
+
+	public static List<OrderInfo> getGeoOrder(int geoId, int status,
+			String startTime, String endTime, int offset, int numb) {
+		
+		String sql = "SELECT * from shipOrder inner join shop on shop.userName = shipOrder.shopUserName "
+				+ " where shop.cityGeoId = " + geoId
+				+ " AND orderStatus = " + status 
+				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
 	
+	public static List<OrderInfo> getGeoOrder(int geoId, int offset, int numb) {
+		
+		String sql = "SELECT * from shipOrder inner join shop on shop.userName = shipOrder.shopUserName "
+				+ " where shop.cityGeoId = " + geoId
+				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
+
 	
+	public static List<OrderInfo> getGeoStatusOrder(int geoId, int orderStatus, int offset, int numb) {
+		String sql = "SELECT * from shipOrder inner join shop on shop.userName = shipOrder.shopUserName "
+				+ " where shop.cityGeoId = " + geoId
+				+ " AND orderStatus = " + orderStatus 
+				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		return getOrderFull(sql);
+	}
 	
 	
 	
@@ -784,8 +846,93 @@ public class OrderDAO {
 	
 	
 	
+	public static List<OrderAggregate> getDateAggregate(String sql) {
+		List<OrderAggregate> result = new ArrayList<OrderAggregate>();
+		Connection conn = null;
+		Statement stmt = null;
+        try {
+        	Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+            stmt = conn.createStatement();
+            ResultSet rs;
+            rs = stmt.executeQuery(sql);
+            while ( rs.next() ) {
+            	OrderAggregate o = new OrderAggregate(
+            			rs.getLong(1), rs.getLong(2), rs.getLong(3), rs.getLong(4), rs.getString(5));
+            	result.add(o);
+            }
+            conn.close();
+        } catch (Exception e) {
+            System.err.println("Got an exception! ");
+            System.err.println(e.getMessage());
+        }
+        
+        return result;
+	}
 	
-	public static Map<String, Long> getDateAggregate(String sql) {
+	
+	public static List<OrderAggregate> orderShopDateAggregate(String shopUserName, String startTime, String endTime) {
+		return getDateAggregate("select count(*), sum(deliveryPrice), sum(productPrice), sum(orderPaid), Date(created) from shipOrder"
+				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
+				+ " and shopUserName = '" + shopUserName + "' "
+				+ " group by DATE(created)"
+				+ " order by created desc"
+				+ ";");
+	}
+	
+	public static List<OrderAggregate> orderShipperDateAggregate(String shipperUserName, String startTime, String endTime) {
+		return getDateAggregate("select count(*), sum(deliveryPrice), sum(productPrice), sum(orderPaid), Date(created) from shipOrder"
+				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
+				+ " and shipperUserName = '" + shipperUserName + "' "
+				+ " group by DATE(created)"
+				+ " order by created desc"
+				+ ";");
+	}
+
+	public static List<OrderAggregate> orderShopDateAggregate(String shopUserName, int orderStatus, String startTime, String endTime) {
+		return getDateAggregate("select count(*), sum(deliveryPrice), sum(productPrice), sum(orderPaid), Date(created) from shipOrder"
+				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
+				+ " and orderStatus = " + orderStatus
+				+ " and shopUserName = '" + shopUserName + "' "
+				+ " order by created desc"
+				+ ";");
+	}
+	
+	public static List<OrderAggregate> orderShipperDateAggregate(String shipperUserName, int orderStatus, String startTime, String endTime) {
+		return getDateAggregate("select count(*), sum(deliveryPrice), sum(productPrice), sum(orderPaid), Date(created) from shipOrder"
+				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
+				+ " and orderStatus = " + orderStatus
+				+ " and shipperUserName = '" + shipperUserName + "' "
+				+ " group by DATE(created)"
+				+ " order by created desc"
+				+ ";");
+	}
+	
+	public static List<OrderAggregate> orderDateAggregate(int orderStatus, String startTime, String endTime) {
+		return getDateAggregate("select count(*), sum(deliveryPrice), sum(productPrice), sum(orderPaid), Date(created) from shipOrder "
+				
+				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
+				+ " and orderStatus = " + orderStatus
+				+ " group by DATE(created)"
+				+ " order by created desc"
+				+ ";");
+	}
+	
+	public static List<OrderAggregate> orderDateAggregate(String startTime, String endTime) {
+		return getDateAggregate("select count(*), sum(deliveryPrice), sum(productPrice), sum(orderPaid), Date(created) from shipOrder "
+				
+				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
+				+ " group by DATE(created)"
+				+ " order by created desc"
+				+ ";");
+	}
+	
+	
+	
+	
+	
+	
+	public static Map<String, Long> getMapDateAggregate(String sql) {
 		Map<String, Long> result = new HashMap<String, Long>();
 		Connection conn = null;
 		Statement stmt = null;
@@ -796,7 +943,7 @@ public class OrderDAO {
             ResultSet rs;
             rs = stmt.executeQuery(sql);
             while ( rs.next() ) {
-            	result.put(rs.getString(1),rs.getLong(2));
+            	result.put(rs.getString(2),rs.getLong(1));
             }
             conn.close();
         } catch (Exception e) {
@@ -809,52 +956,59 @@ public class OrderDAO {
 	
 	
 	
-	public static Map<String, Long> orderShopDateAggregate(String shopUserName, String startTime, String endTime) {
-		return getDateAggregate("select count(*), Date(created) from shipOrder group by DATE(created)"
+	public static Map<String, Long> orderShopMapDateAggregate(String shopUserName, String startTime, String endTime) {
+		return getMapDateAggregate("select count(*), Date(created) from shipOrder"
 				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
 				+ " and shopUserName = '" + shopUserName + "' "
-				+ " order by created"
+				+ " group by DATE(created)"
+				+ " order by created desc"
 				+ ";");
 	}
 	
-	public static Map<String, Long> orderShipperDateAggregate(String shipperUserName, String startTime, String endTime) {
-		return getDateAggregate("select count(*), Date(created) from shipOrder group by DATE(created)"
+	public static Map<String, Long> orderShipperMapDateAggregate(String shipperUserName, String startTime, String endTime) {
+		return getMapDateAggregate("select count(*), Date(created) from shipOrder"
 				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
 				+ " and shipperUserName = '" + shipperUserName + "' "
-				+ " order by created"
+				+ " group by DATE(created)"
+				+ " order by created desc"
 				+ ";");
 	}
 
-	public static Map<String, Long> orderShopDateAggregate(String shopUserName, int orderStatus, String startTime, String endTime) {
-		return getDateAggregate("select count(*), Date(created) from shipOrder group by DATE(created)"
+	public static Map<String, Long> orderShopMapDateAggregate(String shopUserName, int orderStatus, String startTime, String endTime) {
+		return getMapDateAggregate("select count(*), Date(created) from shipOrder"
 				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
 				+ " and orderStatus = " + orderStatus
 				+ " and shopUserName = '" + shopUserName + "' "
-				+ " order by created"
+				+ " order by created desc"
 				+ ";");
 	}
 	
-	public static Map<String, Long> orderShipperDateAggregate(String shipperUserName, int orderStatus, String startTime, String endTime) {
-		return getDateAggregate("select count(*), Date(created) from shipOrder group by DATE(created)"
+	public static Map<String, Long> orderShipperMapDateAggregate(String shipperUserName, int orderStatus, String startTime, String endTime) {
+		return getMapDateAggregate("select count(*), Date(created) from shipOrder"
 				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
 				+ " and orderStatus = " + orderStatus
 				+ " and shipperUserName = '" + shipperUserName + "' "
-				+ " order by created"
+				+ " group by DATE(created)"
+				+ " order by created desc"
 				+ ";");
 	}
 	
-	public static Map<String, Long> orderDateAggregate(int orderStatus, String startTime, String endTime) {
-		return getDateAggregate("select count(*), Date(created) from shipOrder group by DATE(created)"
+	public static Map<String, Long> orderMapDateAggregate(int orderStatus, String startTime, String endTime) {
+		return getMapDateAggregate("select count(*), Date(created) from shipOrder "
+				
 				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
 				+ " and orderStatus = " + orderStatus
-				+ " order by created"
+				+ " group by DATE(created)"
+				+ " order by created desc"
 				+ ";");
 	}
 	
-	public static Map<String, Long> orderDateAggregate(String startTime, String endTime) {
-		return getDateAggregate("select count(*), Date(created) from shipOrder group by DATE(created)"
+	public static Map<String, Long> orderMapDateAggregate(String startTime, String endTime) {
+		return getMapDateAggregate("select count(*), Date(created) from shipOrder "
+				
 				+ " where created >= '" + startTime + "' and created <= '" + endTime + "'"
-				+ " order by created"
+				+ " group by DATE(created)"
+				+ " order by created desc"
 				+ ";");
 	}
 	

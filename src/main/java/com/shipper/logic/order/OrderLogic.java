@@ -1,5 +1,6 @@
 package com.shipper.logic.order;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,16 +8,23 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
 
+import com.shipper.dao.BillDAO;
 import com.shipper.dao.ConfigDAO;
 import com.shipper.dao.OrderDAO;
 import com.shipper.dao.OrderLogDAO;
 import com.shipper.dao.ShipperDAO;
+import com.shipper.dao.ShipperGeoDAO;
+import com.shipper.dao.ShipperProvinceDAO;
 import com.shipper.dao.ShopDAO;
 import com.shipper.logic.Constant;
 import com.shipper.logic.account.AccountLogic;
+import com.shipper.model.CityGeo;
+import com.shipper.model.OrderAggregate;
 import com.shipper.model.OrderInfo;
+import com.shipper.model.ShipBill;
 import com.shipper.model.Shipper;
 import com.shipper.model.ShipperAggregate;
+import com.shipper.model.ShipperGeo;
 import com.shipper.model.Shop;
 import com.shipper.model.ShopAggregate;
 
@@ -560,6 +568,53 @@ public class OrderLogic {
 	
 	
 	
+	public static JSONObject updateProductPrice(int orderId, long productPrice, int role) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		List<OrderInfo> orders = OrderDAO.getOrderFullById(orderId);
+		
+		if(orders.size() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "order not existed");
+
+			result.put("error", error);
+
+			return result;
+		}
+		boolean r1 = OrderDAO.updateProductPrice(orderId, productPrice);
+
+		if(r1) {
+			OrderLogDAO.logOrderUpdate(orderId, "productPrice", productPrice + "", role);
+			
+			result.put("status", Constant.status_ok);
+			result.put("data", data);
+
+			error.put("code", Constant.error_non);
+			error.put("message", "no error");
+
+			result.put("error", error);
+			return result;
+		} else {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "order not existed");
+
+			result.put("error", error);
+
+			return result;
+		}
+		
+	}
+	
+	
+	
 	
 	public static JSONObject getOrderFull(int orderId) {
 		JSONObject result = new JSONObject();
@@ -932,14 +987,14 @@ public class OrderLogic {
 		JSONObject data = new JSONObject();
 		JSONObject error = new JSONObject();
 		
-		Map<String, Long> a;
+		List<OrderAggregate> a; 
 		if(orderStatus == -1) {
 			a = OrderDAO.orderDateAggregate(startTime, endTime);
 		} else {
 			a = OrderDAO.orderDateAggregate(orderStatus, startTime, endTime);
 		}
 		result.put("status", Constant.status_ok);
-		data.put("count", mapToJSON(a));
+		data.put("count", orderAggregateToJSON(a));
 		result.put("data", data);
 		error.put("code", Constant.error_non);
 		error.put("message", "no error");
@@ -965,7 +1020,7 @@ public class OrderLogic {
 
 			return result;
 		} 
-		Map<String, Long> a;
+		List<OrderAggregate> a; 
 		if(orderStatus == -1) {
 			a = OrderDAO.orderShipperDateAggregate(shipperUserName, startTime, endTime);
 		} else {
@@ -973,7 +1028,7 @@ public class OrderLogic {
 		}
 		
 		result.put("status", Constant.status_ok);
-		data.put("count", mapToJSON(a));
+		data.put("count", orderAggregateToJSON(a));
 		result.put("data", data);
 		error.put("code", Constant.error_non);
 		error.put("message", "no error");
@@ -999,14 +1054,14 @@ public class OrderLogic {
 			return result;
 		} 
 		
-		Map<String, Long> a; 
+		List<OrderAggregate> a; 
 		if(orderStatus == -1) {
 			a = OrderDAO.orderShopDateAggregate(shopUserName, startTime, endTime);
 		} else {
 			a = OrderDAO.orderShopDateAggregate(shopUserName, orderStatus, startTime, endTime);
 		}
 		result.put("status", Constant.status_ok);
-		data.put("count", mapToJSON(a));
+		data.put("count", orderAggregateToJSON(a));
 		result.put("data", data);
 		error.put("code", Constant.error_non);
 		error.put("message", "no error");
@@ -1027,6 +1082,18 @@ public class OrderLogic {
 			a.put("count", map.get(key));
 			
 			o.add(a);
+		}
+		
+		return o;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public static JSONArray orderAggregateToJSON(List<OrderAggregate> as) {
+		JSONArray o = new JSONArray();
+		
+		for(OrderAggregate order : as) {
+			o.add(order.toJSON());
 		}
 		
 		return o;
@@ -1090,6 +1157,193 @@ public class OrderLogic {
 		
 		return result;
 	}
+	
+	
+	
+	
+	public static JSONObject getShipperProvinceOrderFullList(String shipUserName, int status,
+			String startTime, String endTime, int offset, int numb) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		List<OrderInfo> orders = new ArrayList<OrderInfo>();
+		if(shipUserName.length() == 0) {
+			result.put("status", Constant.status_ok);
+
+			data.put("orders", orderListToJSON(orders));
+			result.put("data", data);
+
+			error.put("code", Constant.error_non);
+			error.put("message", "no error");
+
+			result.put("error", error);
+			
+			
+			return result;
+		} 
+		
+		List<CityGeo> geoList = ShipperProvinceDAO.getCityGeoByUser(shipUserName);
+		
+		for(CityGeo geo : geoList) {
+			List<OrderInfo> os = OrderDAO.getGeoOrder(geo.getId(), status, startTime, endTime, offset, numb);
+			orders.addAll(os);
+		}
+		
+		
+		result.put("status", Constant.status_ok);
+
+		data.put("orders", orderListToJSON(orders));
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	public static JSONObject getShipperProvinceOrderFullList(String shipUserName, int offset, int numb) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		List<OrderInfo> orders = new ArrayList<OrderInfo>();
+		if(shipUserName.length() == 0) {
+			result.put("status", Constant.status_ok);
+
+			data.put("orders", orderListToJSON(orders));
+			result.put("data", data);
+
+			error.put("code", Constant.error_non);
+			error.put("message", "no error");
+
+			result.put("error", error);
+			
+			
+			return result;
+		} 
+		
+		List<CityGeo> geoList = ShipperProvinceDAO.getCityGeoByUser(shipUserName);
+		
+		for(CityGeo geo : geoList) {
+			List<OrderInfo> os = OrderDAO.getGeoOrder(geo.getId(), offset, numb);
+			orders.addAll(os);
+		}
+		
+		
+		result.put("status", Constant.status_ok);
+
+		data.put("orders", orderListToJSON(orders));
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	public static JSONObject getShipperProvinceOrderFullList(String shipUserName, int orderStatus, int offset, int numb) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		List<OrderInfo> orders = new ArrayList<OrderInfo>();
+		
+		if(shipUserName.length() == 0) {
+			result.put("status", Constant.status_ok);
+
+			data.put("orders", orderListToJSON(orders));
+			result.put("data", data);
+
+			error.put("code", Constant.error_non);
+			error.put("message", "no error");
+
+			result.put("error", error);
+			
+			
+			return result;
+		}
+		
+		List<CityGeo> geoList = ShipperProvinceDAO.getCityGeoByUser(shipUserName);
+		
+		for(CityGeo geo : geoList) {
+			List<OrderInfo> os = OrderDAO.getGeoStatusOrder(geo.getId(), orderStatus, offset, numb);
+			orders.addAll(os);
+		}
+		
+		result.put("status", Constant.status_ok);
+
+		data.put("orders", orderListToJSON(orders));
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	public static JSONObject getGeoOrderFullList(int geoId, int offset, int numb) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		List<OrderInfo> orders;
+		
+		orders = OrderDAO.getGeoOrder(geoId, offset, numb);
+		
+		result.put("status", Constant.status_ok);
+
+		data.put("orders", orderListToJSON(orders));
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	public static JSONObject getGeoOrderFullList(int geoId, int orderStatus, int offset, int numb) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		List<OrderInfo> orders;
+		
+		orders = OrderDAO.getGeoStatusOrder(geoId, orderStatus, offset, numb);
+		
+		
+		result.put("status", Constant.status_ok);
+
+		data.put("orders", orderListToJSON(orders));
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	
+	
+	
 
 	
 	public static JSONObject getShipperOrderFullList(String shipUserName, int offset, int numb) {
@@ -1158,4 +1412,56 @@ public class OrderLogic {
 		
 		return r;
 	}
+	
+	
+	
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	public static JSONArray billToJSON(List<ShipBill> as) {
+		JSONArray o = new JSONArray();
+		
+		for(ShipBill bill : as) {
+			o.add(bill.toJSON());
+		}
+		
+		return o;
+	}
+	public static JSONObject getShopBill(String shopUserName, String startTime, String endTime, 
+			int offset, int numb) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		boolean checkNull = AccountLogic.checkShopNull(shopUserName);
+		if(checkNull || shopUserName.length() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "userName null");
+
+			result.put("error", error);
+
+			return result;
+		} 
+		
+		List<ShipBill> bills = BillDAO.getShipBillById(shopUserName, startTime, endTime, offset, numb);
+		result.put("status", Constant.status_ok);
+
+		data.put("count", billToJSON(bills));
+		result.put("data", data);
+
+		error.put("code", Constant.error_non);
+		error.put("message", "no error");
+
+		result.put("error", error);
+		
+		
+		return result;
+	}
+	
+	
+	
 }
