@@ -1,7 +1,12 @@
 package com.shipper.logic.order;
 
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.json.JSONObject;
 
+import com.shipper.dao.ShipperDAO;
 import com.shipper.logic.notification.MobilePush;
 import com.shipper.model.OrderInfo;
 import com.shipper.model.User;
@@ -12,7 +17,22 @@ public class OrderPush {
 	public static final String order_received = "Khách đã nhận hàng";
 	public static final String order_cancel = "Đơn hàng đã bị hủy";
 	public static final String order_finish = "Đơn hàng đã hoàn thành";
+	public static final String order_update = "Đơn hàng đã sửa đổi";
+	public static final String order_new = "Có đơn hàng mới";
 	
+	public static ExecutorService executorService = Executors.newFixedThreadPool(10);
+	
+	public static void pushShipNewOrder(final int orderId) {
+		executorService.execute(new Runnable() {
+		    public void run() {
+		    	List<String> shippers = ShipperDAO.getAllShipperUserName();
+		    	for(String shipUserName: shippers) {
+		    		pushUser(shipUserName, User.role_shipper, order_new, 
+		    				message(orderId, OrderInfo.order_new));
+		    	}
+		    }
+		});
+	}
 	
 	public static void pushOrder(String shopUserName, String shipperUserName, int orderId, int orderStatus) {
 		if(orderStatus == OrderInfo.order_bidded) {
@@ -26,6 +46,13 @@ public class OrderPush {
 		} else if(orderStatus == OrderInfo.order_finish) {
 			pushShipFinish(shipperUserName, orderId);
 		} 
+	}
+	
+	public static void pushShopUpdate(String shopUserName, int orderId) {
+		pushUser(shopUserName, User.role_shop, order_update, message(orderId, OrderInfo.order_update));
+	}
+	public static void pushShipUpdate(String shipUserName, int orderId) {
+		pushUser(shipUserName, User.role_shipper, order_update, message(orderId, OrderInfo.order_update));
 	}
 	
 	public static void pushShopBidded(String shopUserName, int orderId) {

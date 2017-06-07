@@ -106,7 +106,8 @@ public class OrderDAO {
 			String customerPhone,
 			int deliveryType, 
 			long deliveryPrice, long productPrice,
-			String noteTime, String noteProduct) {
+			String noteTime, String noteProduct,
+			int geoId, String city, String province) {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
@@ -125,10 +126,10 @@ public class OrderDAO {
 						+ " shipOrder(orderId, orderTitle, shopId, shopUserName, shopName,"
 						+ " receiveAddress, customerAddress, customerName, customerPhone,"
 						+ " deliveryType, deliveryPrice, productPrice, noteTime, noteProduct,"
-						+ " orderStatus, created" + ")"
+						+ " orderStatus, created, geoId, city, province" + ")"
 						+ " VALUES ("+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "
 						+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "+ " ?, "
-						+ " ?, "+ " ? "+ ");";
+						+ " ?, "+ " ?, ?, ?, ? "+ ");";
 		    PreparedStatement preparedStmt = conn.prepareStatement(query);
 		    preparedStmt.setInt (1, orderId);
 		    preparedStmt.setString (2, orderTitle);
@@ -146,7 +147,11 @@ public class OrderDAO {
 		    preparedStmt.setString (14, noteProduct);
 		    preparedStmt.setInt (15, OrderInfo.order_wait);
 		    preparedStmt.setTimestamp(16, timestamp);
+		    preparedStmt.setInt(17, geoId);
+		    preparedStmt.setString (18, city);
+		    preparedStmt.setString (19, province);
 
+		    
 		    // execute the preparedstatement
 		    preparedStmt.execute();
 			
@@ -260,6 +265,82 @@ public class OrderDAO {
 		return false;
 	}
 	
+	public static boolean updateShopConfirm(int orderId, int shopConfirm) {
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+			stmt = conn.createStatement();
+			String sql;
+			if(shopConfirm != 0) {
+				sql = "UPDATE "
+						+ " shipOrder SET"
+						+ " shopConfirm = " + shopConfirm + ", "
+						+ " productPrice = shipProductPrice "
+						+ " where orderId = " + orderId + "";
+			} else {
+				sql = "UPDATE "
+						+ " shipOrder SET"
+						+ " shopConfirm = " + shopConfirm + ""
+						+ " where orderId = " + orderId + "";
+			}
+			stmt.executeUpdate(sql);
+			return true;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					conn.close();
+			} catch (SQLException se) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
+	
+	public static boolean updateShipProductPrice(int orderId, long productPrice) {
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+			stmt = conn.createStatement();
+			String sql = "UPDATE "
+					+ " shipOrder SET"
+					+ " shipProductPrice = " + productPrice + " "
+					+ " where orderId = " + orderId + "";
+			stmt.executeUpdate(sql);
+			return true;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					conn.close();
+			} catch (SQLException se) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
 	
 	public static boolean updateProductPrice(int orderId, long productPrice) {
 		Connection conn = null;
@@ -295,7 +376,39 @@ public class OrderDAO {
 		return false;
 	}
 	
-	
+	public static boolean updateDeliveryPrice(int orderId, long deliverPrice) {
+		Connection conn = null;
+		Statement stmt = null;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+			stmt = conn.createStatement();
+			String sql = "UPDATE "
+					+ " shipOrder SET"
+					+ " deliverPrice = " + deliverPrice + " "
+					+ " where orderId = " + orderId + "";
+			stmt.executeUpdate(sql);
+			return true;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					conn.close();
+			} catch (SQLException se) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
 	
 	public static boolean updateOrderPaid(int orderId, long orderPaid) {
 		Connection conn = null;
@@ -528,6 +641,9 @@ public class OrderDAO {
 			
 			order.setOrderStatus(rs.getInt("orderStatus"));
 			
+			order.setShopConfirm(rs.getBoolean("shopConfirm"));
+			order.setShipProductPrice(rs.getLong("shipProductPrice"));
+			
 			order.setShipperId(rs.getInt("shipperId"));
 			order.setShipperName(rs.getString("shipperName"));
 			order.setShipperUserName(rs.getString("shipperUserName"));
@@ -751,27 +867,38 @@ public class OrderDAO {
 	public static List<OrderInfo> getGeoOrder(int geoId, int status,
 			String startTime, String endTime, int offset, int numb) {
 		
-		String sql = "SELECT * from shipOrder inner join shop on shop.userName = shipOrder.shopUserName "
-				+ " where shop.cityGeoId = " + geoId
+		String sql = "SELECT * from shipOrder "
+				+ " where geoId = " + geoId
 				+ " AND orderStatus = " + status 
 				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		
+//		String sql = "SELECT * from shipOrder inner join shop on shop.userName = shipOrder.shopUserName "
+//				+ " where shop.cityGeoId = " + geoId
+//				+ " AND orderStatus = " + status 
+//				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
 		return getOrderFull(sql);
 	}
 	
 	public static List<OrderInfo> getGeoOrder(int geoId, int offset, int numb) {
-		
-		String sql = "SELECT * from shipOrder inner join shop on shop.userName = shipOrder.shopUserName "
-				+ " where shop.cityGeoId = " + geoId
-				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+		String sql = "SELECT * from shipOrder "
+				+ " where geoId = " + geoId
+				+ " order by orderId desc limit " + offset  + ", " + numb + ";";		
+//		String sql = "SELECT * from shipOrder inner join shop on shop.userName = shipOrder.shopUserName "
+//				+ " where shop.cityGeoId = " + geoId
+//				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
 		return getOrderFull(sql);
 	}
 
 	
 	public static List<OrderInfo> getGeoStatusOrder(int geoId, int orderStatus, int offset, int numb) {
-		String sql = "SELECT * from shipOrder inner join shop on shop.userName = shipOrder.shopUserName "
-				+ " where shop.cityGeoId = " + geoId
+		String sql = "SELECT * from shipOrder "
+				+ " where geoId = " + geoId
 				+ " AND orderStatus = " + orderStatus 
 				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
+//		String sql = "SELECT * from shipOrder inner join shop on shop.userName = shipOrder.shopUserName "
+//				+ " where shop.cityGeoId = " + geoId
+//				+ " AND orderStatus = " + orderStatus 
+//				+ " order by orderId desc limit " + offset  + ", " + numb + ";";
 		return getOrderFull(sql);
 	}
 	

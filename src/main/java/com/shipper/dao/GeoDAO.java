@@ -31,6 +31,8 @@ public class GeoDAO {
 			city.setProvince(rs.getString("province"));
 			city.setDetail(rs.getString("detail"));
 			city.setUpdated(rs.getTimestamp("updated"));
+			city.setShipPrice(rs.getLong("shipPrice"));
+			city.setFastShipPrice(rs.getLong("fastShipPrice"));
 			
 			
 		} catch (Exception e) {
@@ -66,7 +68,7 @@ public class GeoDAO {
 
 	
 
-	public static boolean updateCityGeo(int id, String city, String province, String detail) {
+	public static boolean updateCityGeo(int id, String city, String province, String detail, long shipPrice, long fastShipPrice) {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
@@ -82,14 +84,18 @@ public class GeoDAO {
 						+ " city = ?, "
 						+ " province = ?, "
 						+ " detail = ?, "
-						+ " updated = ?"
+						+ " updated = ?, "
+						+ " shipPrice = ?, "
+						+ " fastShipPrice = ?, "
 						+ " where id = ?;";
 		    PreparedStatement preparedStmt = conn.prepareStatement(query);
 		    preparedStmt.setString (1, city);
 		    preparedStmt.setString (2, province);
 		    preparedStmt.setString (3, detail);
 		    preparedStmt.setTimestamp(4, timestamp);
-		    preparedStmt.setInt (5, id);
+		    preparedStmt.setLong (6, shipPrice);
+		    preparedStmt.setLong (7, fastShipPrice);
+		    preparedStmt.setInt (8, id);
 
 		    
 		    preparedStmt.execute();

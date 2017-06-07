@@ -11,6 +11,8 @@ public class OrderInfo {
 	public static final int order_cancel = 5;
 	public static final int order_error = 6;
 	public static final int order_paid = 7;
+	public static final int order_update = 8;
+	public static final int order_new = 9;
 	
 	
 	private int orderId;
@@ -33,8 +35,21 @@ public class OrderInfo {
 	private String noteTime;
 	private String noteProduct;
 	
+	private boolean shopConfirm;
+	private long shipProductPrice;
 	
-	
+	public boolean isShopConfirm() {
+		return shopConfirm;
+	}
+	public void setShopConfirm(boolean shopConfirm) {
+		this.shopConfirm = shopConfirm;
+	}
+	public long getShipProductPrice() {
+		return shipProductPrice;
+	}
+	public void setShipProductPrice(long shipProductPrice) {
+		this.shipProductPrice = shipProductPrice;
+	}
 	private int orderStatus;
 	private long shipperId;
 	private String shipperName;
@@ -126,6 +141,9 @@ public class OrderInfo {
 		o.put("finishTime", this.getFinishTime());
 		o.put("statusShopConfirmed", this.getStatusShopConfirmed());
 		o.put("statusShipperConfirmed", this.getStatusShipperConfirmed());
+		
+		o.put("shopConfirm", this.isShopConfirm());
+		o.put("shipProductPrice", this.getShipProductPrice());
 		
 		o.put("created", this.getCreated());
 		o.put("updated", this.getUpdated());

@@ -13,7 +13,6 @@ import com.shipper.dao.ConfigDAO;
 import com.shipper.dao.OrderDAO;
 import com.shipper.dao.OrderLogDAO;
 import com.shipper.dao.ShipperDAO;
-import com.shipper.dao.ShipperGeoDAO;
 import com.shipper.dao.ShipperProvinceDAO;
 import com.shipper.dao.ShopDAO;
 import com.shipper.logic.Constant;
@@ -24,9 +23,9 @@ import com.shipper.model.OrderInfo;
 import com.shipper.model.ShipBill;
 import com.shipper.model.Shipper;
 import com.shipper.model.ShipperAggregate;
-import com.shipper.model.ShipperGeo;
 import com.shipper.model.Shop;
 import com.shipper.model.ShopAggregate;
+import com.shipper.model.User;
 
 public class OrderLogic {
 	
@@ -210,6 +209,19 @@ public class OrderLogic {
 		}
 
 	}
+	
+	
+	public static void updateDeliveryPrice(int orderId, int orderStatus, long deliveryPrice) {
+		if(orderStatus == OrderInfo.order_wait 
+				|| orderStatus == OrderInfo.order_bidded) {
+			OrderDAO.updateDeliveryPrice(orderId, 0);
+		}
+		if(orderStatus == OrderInfo.order_shipped
+				|| orderStatus == OrderInfo.order_received
+				) {
+			OrderDAO.updateDeliveryPrice(orderId, deliveryPrice / 2);
+		}
+	}
 
 	public static JSONObject cancelOrder(int orderId, String shopUserName) {
 		JSONObject result = new JSONObject();
@@ -246,15 +258,20 @@ public class OrderLogic {
 			Shop shop = shopList.get(0);
 			OrderInfo order = orderList.get(0);
 			int status = order.getOrderStatus();
+			long deliveryPrice = order.getDeliveryPrice();
 			
-			if ((status == OrderInfo.order_wait || status == OrderInfo.order_bidded) 
+			if ((status == OrderInfo.order_wait 
+					|| status == OrderInfo.order_bidded 
+					|| status == OrderInfo.order_shipped) 
 					&& order.getShopUserName().equals(shop.getUserName())) {
-				// Update password
+				
 				boolean r = OrderDAO.cancelOrder(orderId);
 
 				if (r) {
 					
 					OrderPush.pushOrder(order.getShopUserName(), order.getShipperUserName(), orderId, OrderInfo.order_cancel);
+					// Update orderPrice
+					updateDeliveryPrice(orderId, status, deliveryPrice);
 					
 					result.put("status", Constant.status_ok);
 					
@@ -312,7 +329,8 @@ public class OrderLogic {
 	public static JSONObject createOrder(String orderTitle, String userName,
 			String receiveAddress, String customerAddress, String customerName,
 			String customerPhone, int deliveryType, long deliveryPrice,
-			long productPrice, String noteTime, String noteProduct) {
+			long productPrice, String noteTime, String noteProduct,
+			int geoId, String city, String province) {
 
 		JSONObject result = new JSONObject();
 		JSONObject data = new JSONObject();
@@ -338,10 +356,12 @@ public class OrderLogic {
 		boolean r = OrderDAO.createOrder(order_id, orderTitle, shopId, userName, shopName,
 				receiveAddress, customerAddress, customerName, customerPhone,
 				deliveryType, deliveryPrice, productPrice, noteTime,
-				noteProduct);
+				noteProduct,
+				geoId, city, province);
 
 		if (r) {
 			createOrderLock(order_id);
+			OrderPush.pushShipNewOrder(order_id);
 			
 			
 			result.put("status", Constant.status_ok);
@@ -566,7 +586,100 @@ public class OrderLogic {
 		
 	}
 	
+	public static JSONObject updateShopConfirm(int orderId) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		List<OrderInfo> orders = OrderDAO.getOrderFullById(orderId);
+		
+		if(orders.size() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "order not existed");
+
+			result.put("error", error);
+
+			return result;
+		}
+		boolean r1 =OrderDAO.updateShopConfirm(orderId, 1);
+		
+		if(r1) {
+			OrderInfo o = orders.get(0);
+			OrderLogDAO.logOrderUpdate(orderId, "shopConfirm", 1 + "", User.role_shop);
+			OrderPush.pushShipUpdate(o.getShipperUserName(), orderId);
+			
+			result.put("status", Constant.status_ok);
+			result.put("data", data);
+
+			error.put("code", Constant.error_non);
+			error.put("message", "no error");
+
+			result.put("error", error);
+			return result;
+		} else {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "order not existed");
+
+			result.put("error", error);
+
+			return result;
+		}
+		
+	}
 	
+	public static JSONObject updateShipProductPrice(int orderId, long productPrice) {
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+		
+		List<OrderInfo> orders = OrderDAO.getOrderFullById(orderId);
+		
+		if(orders.size() == 0) {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "order not existed");
+
+			result.put("error", error);
+
+			return result;
+		}
+		boolean r1 = OrderDAO.updateShipProductPrice(orderId, productPrice);
+		OrderDAO.updateShopConfirm(orderId, 0);
+
+		if(r1) {
+			OrderInfo o = orders.get(0);
+			OrderLogDAO.logOrderUpdate(orderId, "productPrice", productPrice + "", User.role_shipper);
+			OrderPush.pushShopUpdate(o.getShopUserName(), orderId);
+			
+			result.put("status", Constant.status_ok);
+			result.put("data", data);
+
+			error.put("code", Constant.error_non);
+			error.put("message", "no error");
+
+			result.put("error", error);
+			return result;
+		} else {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_db);
+			error.put("message", "order not existed");
+
+			result.put("error", error);
+
+			return result;
+		}
+		
+	}
 	
 	public static JSONObject updateProductPrice(int orderId, long productPrice, int role) {
 		JSONObject result = new JSONObject();
@@ -587,6 +700,7 @@ public class OrderLogic {
 			return result;
 		}
 		boolean r1 = OrderDAO.updateProductPrice(orderId, productPrice);
+		OrderDAO.updateShopConfirm(orderId, 0);
 
 		if(r1) {
 			OrderLogDAO.logOrderUpdate(orderId, "productPrice", productPrice + "", role);

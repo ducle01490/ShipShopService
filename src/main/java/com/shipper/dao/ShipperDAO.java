@@ -25,6 +25,30 @@ public class ShipperDAO {
 	public static void main(String[] args) {
 	}
 	
+	
+	public static List<String> getAllShipperUserName() {
+		List<String> result = new ArrayList<String>();
+		Connection conn = null;
+		Statement stmt = null;
+        try {
+        	Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(Constant.DB_URL, Constant.USER, Constant.PASS);
+            stmt = conn.createStatement();
+            ResultSet rs;
+            String sql = "select userName from shipper order by shipper_id desc;";
+            rs = stmt.executeQuery(sql);
+            while ( rs.next() ) {
+            	String userName = rs.getString("userName");
+                result.add(userName);
+            }
+            conn.close();
+        } catch (Exception e) {
+            System.err.println("Got an exception! ");
+            System.err.println(e.getMessage());
+        }
+        
+        return result;
+    }
 
 	
 	public static List<Shipper> getShipperByUserName(String userName) {

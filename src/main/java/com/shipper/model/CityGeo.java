@@ -12,9 +12,24 @@ public class CityGeo {
 	private String detail;
 	private Timestamp updated;
 	
+	private long shipPrice;
+	private long fastShipPrice;
 	
 	
 	
+	
+	public long getShipPrice() {
+		return shipPrice;
+	}
+	public void setShipPrice(long shipPrice) {
+		this.shipPrice = shipPrice;
+	}
+	public long getFastShipPrice() {
+		return fastShipPrice;
+	}
+	public void setFastShipPrice(long fastShipPrice) {
+		this.fastShipPrice = fastShipPrice;
+	}
 	public CityGeo() {
 		super();
 	}
@@ -68,6 +83,8 @@ public class CityGeo {
 		
 		o.put("detail", this.getDetail());
 		//o.put("updated", this.getUpdated().toString());
+		o.put("shipPrice", this.getShipPrice());
+		o.put("fastShipPrice", this.getFastShipPrice());
 		
 		return o;
 	}
