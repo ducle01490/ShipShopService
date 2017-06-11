@@ -990,7 +990,7 @@ public class AccountLogic {
 
 				if (checkCode) {
 					boolean r = ShipperDAO.updateShipperStatus(userName,
-							User.s_activated);
+							User.s_deactivated);
 
 					if (r) {
 

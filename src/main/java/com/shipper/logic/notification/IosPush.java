@@ -13,17 +13,19 @@ public class IosPush {
 	public static boolean dev_or_product = true;
 	
 	
-	public static String dev_cert_shop = "Certificates_Shop_dev.p12";
+	public static String dev_cert_shop = "SHOP_DEV_new.p12"; 
+			//"SHOP_DEV.p12"; 
+			//"Shop_Push_Dev_Certificates.p12";
 	public static String dev_pass_shop = "123456789";
 	
-	public static String pro_cert_shop = "Certificates_Shop_dev.p12";
+	public static String pro_cert_shop = "Shop_Push_DIS_Certificates.p12";
 	public static String pro_pass_shop = "123456789";
 	
 	
-	public static String dev_cert_ship = "shipper_1_new_certificates.p12";//"ship_new_certificates.p12"; //"Shipper_dev_Certificates.p12";//
+	public static String dev_cert_ship = "Shipper_Push_Dev_Certificates.p12";//"ship_new_certificates.p12"; //"Shipper_dev_Certificates.p12";//
 	public static String dev_pass_ship = "123456789";
 	
-	public static String pro_cert_ship = "shipper_1_new_certificates.p12";//"ship_new_certificates.p12";
+	public static String pro_cert_ship = "Shipper_Push_DIS_Certificates.p12";//"ship_new_certificates.p12";
 	public static String pro_pass_ship = "123456789";
 	
 	
@@ -33,8 +35,12 @@ public class IosPush {
 	
 	public static void samplePush() {
 		List<String> tempRegis = new ArrayList<String>();
-		tempRegis.add("1");
-		tempRegis.add("5e9658a80174a038ad408e60bcff60ad1e618089bda5fd09c9905e0c004b6b38");
+		//tempRegis.add("1");
+		tempRegis.add(
+				"404daba4f08c1ff4234d6ef207a01effc42588cb3fef71e60fc42fedfad8b087");
+				//"905663ed14b793ba7fb4c1e09aa3b87ed3476637601b07345e0f9c26da32e366");
+				//"3b1921b82cbb8144a9b31713b2f7431b1770a4762b2bb17ef357b2b06e77a381");
+				//"4424e19b145f4880d33ecb8db639492e2ca087a4d73d1e026a312a9ed411dd1f"); 
 		sendPushList(initService(User.role_shipper), tempRegis, "title", "message");
 	}
 	
@@ -87,11 +93,11 @@ public class IosPush {
 	public static ApnsService initService(int role) {
 		if(role == User.role_shop) {
 			if(dev_or_product) {
-				
+				System.out.println("init dev + role_shop");
 				ApnsService service = APNS
 						.newService()
-						.withCert(Thread.currentThread().getContextClassLoader().getResourceAsStream(dev_cert_shop), dev_pass_shop)
-						//.withCert("Certificates_Shop_dev.p12","123456789")
+						//.withCert(Thread.currentThread().getContextClassLoader().getResourceAsStream(dev_cert_shop), dev_pass_shop)
+						.withCert("SHOP_DEV_DIS_1.p12","123456789")
 						//.withProductionDestination()
 						.withSandboxDestination().build();
 				

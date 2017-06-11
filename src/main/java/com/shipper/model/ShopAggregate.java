@@ -8,27 +8,29 @@ public class ShopAggregate {
 	private long shipMoney;
 	private long productMoney;
 	private long paidMoney;
+	private long finishOrder;
+	private long cancelOrder;
 	
 	
 	
 	
 	
 	public ShopAggregate(String shopUserName, long totalOrder,
-			long shipMoney, long productMoney, long paidMoney) {
+			long shipMoney, long productMoney, long paidMoney, long finishOrder, long cancelOrder) {
 		super();
 		this.setShopUserName(shopUserName);
 		this.totalOrder = totalOrder;
 		this.shipMoney = shipMoney;
 		this.productMoney = productMoney;
 		this.setPaidMoney(paidMoney);
+		this.finishOrder = finishOrder;
+		this.cancelOrder = cancelOrder;
 	}
 	
 	public long getTotalOrder() {
 		return totalOrder;
 	}
-	public void setTotalOrder(int totalOrder) {
-		this.totalOrder = totalOrder;
-	}
+
 
 
 	
@@ -40,6 +42,8 @@ public class ShopAggregate {
 		o.put("shipMoney", this.getShipMoney());
 		o.put("productMoney", this.getProductMoney());
 		o.put("paidMoney", this.getPaidMoney());
+		o.put("cancelOrder", this.getCancelOrder());
+		o.put("finishOrder", this.getFinishOrder());
 		
 		return o;
 	}
@@ -72,6 +76,26 @@ public class ShopAggregate {
 
 	public void setShipMoney(long shipMoney) {
 		this.shipMoney = shipMoney;
+	}
+
+	public long getFinishOrder() {
+		return finishOrder;
+	}
+
+	public void setFinishOrder(long finishOrder) {
+		this.finishOrder = finishOrder;
+	}
+
+	public long getCancelOrder() {
+		return cancelOrder;
+	}
+
+	public void setCancelOrder(long cancelOrder) {
+		this.cancelOrder = cancelOrder;
+	}
+
+	public void setTotalOrder(long totalOrder) {
+		this.totalOrder = totalOrder;
 	}
 	
 

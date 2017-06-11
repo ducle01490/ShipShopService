@@ -703,7 +703,9 @@ public class OrderLogic {
 		OrderDAO.updateShopConfirm(orderId, 0);
 
 		if(r1) {
+			OrderInfo o = orders.get(0);
 			OrderLogDAO.logOrderUpdate(orderId, "productPrice", productPrice + "", role);
+			OrderPush.pushShipUpdate(o.getShipperUserName(), orderId);
 			
 			result.put("status", Constant.status_ok);
 			result.put("data", data);

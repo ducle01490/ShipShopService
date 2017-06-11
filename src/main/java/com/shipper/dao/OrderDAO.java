@@ -736,7 +736,12 @@ public class OrderDAO {
 		long paidMoney = getAggregate(
 				"select  SUM(orderPaid) from shipOrder where shopUserName = '" + shopUserName + "';"); 
 		
-		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney);
+		long finishOrder = getAggregate(
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_finish + ";"); 
+		long cancelOrder = getAggregate(
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_cancel + ";");
+		
+		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney, finishOrder, cancelOrder);
 		return r;
 	}
 	
@@ -766,7 +771,12 @@ public class OrderDAO {
 		long paidMoney = getAggregate(
 				"select  SUM(orderPaid) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + orderStatus + ";"); 
 		
-		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney);
+		long finishOrder = getAggregate(
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_finish + ";"); 
+		long cancelOrder = getAggregate(
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_cancel + ";"); 
+		
+		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney, finishOrder, cancelOrder);
 		return r;
 	}
 	
@@ -812,7 +822,14 @@ public class OrderDAO {
 				+ "shopUserName = '" + shopUserName + "' and orderStatus = " + orderStatus 
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		
-		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney);
+		long finishOrder = getAggregate(
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_finish 
+				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
+		long cancelOrder = getAggregate(
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_cancel 
+				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
+		
+		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney, finishOrder, cancelOrder);
 		return r;
 	}
 	
@@ -857,7 +874,14 @@ public class OrderDAO {
 				+ "shopUserName = '" + shopUserName + "' "
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		
-		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney);
+		long finishOrder = getAggregate(
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_finish 
+				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
+		long cancelOrder = getAggregate(
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_cancel 
+				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
+		
+		ShopAggregate r = new ShopAggregate(shopUserName, totalOrder, totalMoney, productMoney, paidMoney, finishOrder, cancelOrder);
 		return r;
 	}
 	
