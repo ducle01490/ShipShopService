@@ -15,14 +15,14 @@ public class IosPush {
 	public static String dev_cert_shop = "Shop_Dev_Only_Certificates.p12";//"Shop_Dev_Certificates.p12";
 	public static String dev_pass_shop = "123456789";
 	
-	public static String pro_cert_shop = "Shop_Dev_Certificates.p12";
+	public static String pro_cert_shop = "Shop_Dis_Certificates.p12";
 	public static String pro_pass_shop = "123456789";
 	
 	
 	public static String dev_cert_ship = "Shipper_Dev_Certificates.p12";//"ship_new_certificates.p12"; //"Shipper_dev_Certificates.p12";//
 	public static String dev_pass_ship = "123456789";
 	
-	public static String pro_cert_ship = "Shipper_Dev_Certificates.p12";//"ship_new_certificates.p12";
+	public static String pro_cert_ship = "Shipper_Dis_Certificates.p12";//"ship_new_certificates.p12";
 
 	public static String pro_pass_ship = "123456789";
 	
@@ -78,10 +78,15 @@ public class IosPush {
 		return result;
 	}
 	
-	
 	public static String pushIos(List<String> deviceToken, String notification, int role) {
+		pushIos(deviceToken, notification, role, false);
+		pushIos(deviceToken, notification, role, true);
+		return "ok";
+	}
+	
+	public static String pushIos(List<String> deviceToken, String notification, int role, boolean devOrProduct) {
 		String result = "";
-		ApnsService service = initService(role);
+		ApnsService service = initService(role, devOrProduct);
 		service.push(deviceToken, notification);
 		Map<String, Date> inactiveDevice = service.getInactiveDevices();
 		for(String device : inactiveDevice.keySet()){
@@ -95,7 +100,56 @@ public class IosPush {
 	}
 
 
-	
+	public static ApnsService initService(int role, boolean devOrProduct) {
+		if(role == User.role_shop) {
+			if(devOrProduct) {
+				System.out.println("init dev + role_shop");
+				ApnsService service = APNS
+						.newService()
+
+						.withCert(IosPush.class.getClassLoader().getResourceAsStream(dev_cert_shop), dev_pass_shop)
+						//.withCert("Certificates_Shop_dev.p12","123456789")
+
+						//.withProductionDestination()
+						.withSandboxDestination().build();
+				
+				return service;
+			} else {
+				ApnsService service = APNS
+						.newService()
+						.withCert(IosPush.class.getClassLoader().getResourceAsStream(pro_cert_shop), pro_pass_shop)
+						//.withCert("doc/Certificates_Shop_dev.p12","123456789")
+//						.withProductionDestination()
+						.withSandboxDestination()
+						.build();
+				
+				return service;
+			}
+		
+		} else {
+			if(devOrProduct) {
+				System.out.println("init dev + role_ship");
+				ApnsService service = APNS
+						.newService()
+						.withCert(IosPush.class.getClassLoader().getResourceAsStream(dev_cert_ship), dev_pass_ship)
+						//.withCert("Certificates_Shop_dev.p12","123456789")
+						//.withProductionDestination()
+						.withSandboxDestination().build();
+				
+				return service;
+			} else {
+				ApnsService service = APNS
+						.newService()
+						.withCert(IosPush.class.getClassLoader().getResourceAsStream(pro_cert_ship), pro_pass_ship)
+						//.withCert("doc/Certificates_Shop_dev.p12","123456789")
+//						.withProductionDestination()
+						.withSandboxDestination()
+						.build();
+				
+				return service;
+			}
+		}
+	}
 	
 	public static ApnsService initService(int role) {
 		if(role == User.role_shop) {
