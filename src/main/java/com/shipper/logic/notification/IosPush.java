@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
+import com.shipper.logic.order.OrderPush;
 import com.shipper.model.User;
 
 public class IosPush {
@@ -11,7 +12,7 @@ public class IosPush {
 	
 	
 
-	public static String dev_cert_shop = "Shop_Dev_Certificates.p12";
+	public static String dev_cert_shop = "Shop_Dev_Only_Certificates.p12";//"Shop_Dev_Certificates.p12";
 	public static String dev_pass_shop = "123456789";
 	
 	public static String pro_cert_shop = "Shop_Dev_Certificates.p12";
@@ -33,11 +34,20 @@ public class IosPush {
 	public static void samplePush() {
 		List<String> tempRegis = new ArrayList<String>();
 
-//		tempRegis.add("1");
-//		tempRegis.add("651ca8f60c54bd1fdc2ab5956ef4318816272649bf51e9f7ab094a9bcf1c859b");
-//		sendPushList(initService(User.role_shipper), tempRegis, "title", "message");
-		sendPushList(initService(User.role_shop), Arrays.asList("c11e033a6a7e7fd603a1684f4dabd6643ecc06715c5e98c6a63dd7c691d32989"), "title", "message");
-		sendPushList(initService(User.role_shipper), Arrays.asList("651ca8f60c54bd1fdc2ab5956ef4318816272649bf51e9f7ab094a9bcf1c859b"), "title", "message");
+		tempRegis.add("651ca8f60c54bd1fdc2ab5956ef4318816272649bf51e9f7ab094a9bcf1c859b");
+		sendPushList(initService(User.role_shipper), tempRegis, "title shipper", OrderPush.message(111, 1));
+		
+		
+//		tempRegis.add("465bc05d24382c851d42b34765ab075e1f01eba5a162fa004680c5419ecb6b58");
+//		sendPushList(initService(User.role_shop), tempRegis, "title shop", OrderPush.message(111, 1));
+		
+//		sendPushList(initService(User.role_shop), 
+//				Arrays.asList("465bc05d24382c851d42b34765ab075e1f01eba5a162fa004680c5419ecb6b58"), 
+//				"title shop", OrderPush.message(111, 1));
+		
+//		sendPushList(initService(User.role_shipper), 
+//				Arrays.asList("651ca8f60c54bd1fdc2ab5956ef4318816272649bf51e9f7ab094a9bcf1c859b"), 
+//				"title", OrderPush.message(111, 1));
 
 	}
 	
@@ -146,8 +156,9 @@ public class IosPush {
 		List<String> returnVl = new ArrayList<String>();
 		apnsService.start();
 		String body = "{\"aps\":{\"alert\":\""+title+"\","
-				+"\"message\":\""+message+"\","
-				+ "\"badge\":0,\"sound\":\"default\"}}";
+				+"\"message\":"+message+","
+				//+"\"message\":\""+"hihi"+"\","
+				+ "\"badge\":1,\"sound\":\"default\"}}";
 		System.out.println(body);
 		apnsService.push(tempRegis,
 				body);

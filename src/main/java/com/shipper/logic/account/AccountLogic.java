@@ -779,6 +779,144 @@ public class AccountLogic {
 	
 	
 	
+	
+	public static JSONObject changePassword(String userName,
+			String newPassword, String oldPassword, int userType) {
+
+		JSONObject result = new JSONObject();
+		JSONObject data = new JSONObject();
+		JSONObject error = new JSONObject();
+
+		if (userType == User.role_shop) {
+			boolean checkShopNull = checkShopNull(userName);
+			if (checkShopNull || userName == null || userName.length() == 0) {
+				result.put("status", Constant.status_error);
+				result.put("data", data);
+
+				error.put("code", Constant.error_db);
+				error.put("message", "userName not existed | userName is null");
+
+				result.put("error", error);
+
+				return result;
+			} else {
+				
+				Shop shop = ShopDAO.getShopByUserName(userName).get(0);
+				boolean checkCode = oldPassword.equals(shop.getPassword());
+				if (checkCode == false)
+					checkCode = checkPassword(oldPassword, shop.getPassword());
+
+				if (checkCode) {
+					// Update password
+					boolean r = ShopDAO.updateShopPassword(userName,
+							hashPassword(newPassword));
+
+					if (r) {
+						result.put("status", Constant.status_ok);
+						result.put("data", data);
+
+						error.put("code", Constant.error_non);
+						error.put("message", "no error");
+
+						result.put("error", error);
+
+						return result;
+					} else {
+						result.put("status", Constant.status_error);
+						result.put("data", data);
+
+						error.put("code", Constant.error_db);
+						error.put("message", "db error");
+
+						result.put("error", error);
+
+						return result;
+					}
+				} else {
+					result.put("status", Constant.status_error);
+					result.put("data", data);
+
+					error.put("code", Constant.error_verified_code);
+					error.put("message", "error verified code");
+
+					result.put("error", error);
+
+					return result;
+				}
+			}
+
+		} else if (userType == User.role_shipper) {
+			boolean checkShipNull = checkShipperNull(userName);
+			if (checkShipNull || userName == null || userName.length() == 0) {
+				result.put("status", Constant.status_error);
+				result.put("data", data);
+
+				error.put("code", Constant.error_db);
+				error.put("message",
+						"userName not existed | userName is null | password is null");
+
+				result.put("error", error);
+
+				return result;
+			} else {
+				Shipper ship = ShipperDAO.getShipperByUserName(userName).get(0);
+				boolean checkCode = oldPassword.equals(ship.getPassword());
+				if (checkCode == false)
+					checkCode = checkPassword(oldPassword, ship.getPassword());
+
+				if (checkCode) {
+					// Update password
+					boolean r = ShipperDAO.updateShipperPassword(userName,
+							hashPassword(newPassword));
+
+					if (r) {
+
+						result.put("status", Constant.status_ok);
+						result.put("data", data);
+
+						error.put("code", Constant.error_non);
+						error.put("message", "no error");
+
+						result.put("error", error);
+
+						return result;
+					} else {
+						result.put("status", Constant.status_error);
+						result.put("data", data);
+
+						error.put("code", Constant.error_db);
+						error.put("message", "db error");
+
+						result.put("error", error);
+
+						return result;
+					}
+				} else {
+					result.put("status", Constant.status_error);
+					result.put("data", data);
+
+					error.put("code", Constant.error_verified_code);
+					error.put("message", "error verified code");
+
+					result.put("error", error);
+
+					return result;
+				}
+			}
+		} else {
+			result.put("status", Constant.status_error);
+			result.put("data", data);
+
+			error.put("code", Constant.error_request);
+			error.put("message", "wrong role");
+
+			result.put("error", error);
+
+		}
+
+		return result;
+	}
+	
 
 	public static JSONObject updatePhone(String userName, String phoneNumber,
 			int userType) {
