@@ -119,8 +119,8 @@ public class IosPush {
 						.newService()
 						.withCert(IosPush.class.getClassLoader().getResourceAsStream(pro_cert_shop), pro_pass_shop)
 						//.withCert("doc/Certificates_Shop_dev.p12","123456789")
-//						.withProductionDestination()
-						.withSandboxDestination()
+						.withProductionDestination()
+						//.withSandboxDestination()
 						.build();
 				
 				return service;
@@ -142,8 +142,8 @@ public class IosPush {
 						.newService()
 						.withCert(IosPush.class.getClassLoader().getResourceAsStream(pro_cert_ship), pro_pass_ship)
 						//.withCert("doc/Certificates_Shop_dev.p12","123456789")
-//						.withProductionDestination()
-						.withSandboxDestination()
+						.withProductionDestination()
+						//.withSandboxDestination()
 						.build();
 				
 				return service;
@@ -170,8 +170,8 @@ public class IosPush {
 						.newService()
 						.withCert(IosPush.class.getClassLoader().getResourceAsStream(pro_cert_shop), pro_pass_shop)
 						//.withCert("doc/Certificates_Shop_dev.p12","123456789")
-//						.withProductionDestination()
-						.withSandboxDestination()
+						.withProductionDestination()
+						//.withSandboxDestination()
 						.build();
 				
 				return service;
@@ -193,8 +193,8 @@ public class IosPush {
 						.newService()
 						.withCert(IosPush.class.getClassLoader().getResourceAsStream(pro_cert_ship), pro_pass_ship)
 						//.withCert("doc/Certificates_Shop_dev.p12","123456789")
-//						.withProductionDestination()
-						.withSandboxDestination()
+						.withProductionDestination()
+						//.withSandboxDestination()
 						.build();
 				
 				return service;
