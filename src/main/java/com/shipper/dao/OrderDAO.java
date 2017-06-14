@@ -737,7 +737,7 @@ public class OrderDAO {
 				"select  SUM(orderPaid) from shipOrder where shopUserName = '" + shopUserName + "';"); 
 		
 		long finishOrder = getAggregate(
-				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_finish + ";"); 
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_received + ";"); 
 		long cancelOrder = getAggregate(
 				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_cancel + ";");
 		
@@ -772,7 +772,7 @@ public class OrderDAO {
 				"select  SUM(orderPaid) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + orderStatus + ";"); 
 		
 		long finishOrder = getAggregate(
-				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_finish + ";"); 
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_received + ";"); 
 		long cancelOrder = getAggregate(
 				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_cancel + ";"); 
 		
@@ -823,7 +823,7 @@ public class OrderDAO {
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		
 		long finishOrder = getAggregate(
-				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_finish 
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_received 
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		long cancelOrder = getAggregate(
 				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_cancel 
@@ -875,7 +875,7 @@ public class OrderDAO {
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		
 		long finishOrder = getAggregate(
-				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_finish 
+				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_received 
 				+ " and created >= '" + startTime + "' and created <= '" + endTime + "' ;");
 		long cancelOrder = getAggregate(
 				"select  count(*) from shipOrder where shopUserName = '" + shopUserName + "' and orderStatus = " + OrderInfo.order_cancel 

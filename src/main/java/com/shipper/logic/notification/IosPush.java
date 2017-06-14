@@ -8,7 +8,7 @@ import com.shipper.logic.order.OrderPush;
 import com.shipper.model.User;
 
 public class IosPush {
-	public static boolean dev_or_product = true;
+	public static boolean dev_or_product = false;
 	
 	
 
@@ -34,12 +34,12 @@ public class IosPush {
 	public static void samplePush() {
 		List<String> tempRegis = new ArrayList<String>();
 
-		tempRegis.add("651ca8f60c54bd1fdc2ab5956ef4318816272649bf51e9f7ab094a9bcf1c859b");
-		sendPushList(initService(User.role_shipper), tempRegis, "title shipper", OrderPush.message(111, 1));
+//		tempRegis.add("bb6f1b34de36857a969ca1e61d111013a1e0f53c6aecfafaa4e0c02388d44eff");
+//		sendPushList(initService(User.role_shipper), tempRegis, "title shipper", OrderPush.message(111, 1));
 		
 		
-//		tempRegis.add("465bc05d24382c851d42b34765ab075e1f01eba5a162fa004680c5419ecb6b58");
-//		sendPushList(initService(User.role_shop), tempRegis, "title shop", OrderPush.message(111, 1));
+		tempRegis.add("e70ca4909df1b72fc14a5bca6612abd8e7d9a987e025e4dadaf9ea2bbd3179c3");
+		sendPushList(initService(User.role_shop), tempRegis, "title shop", OrderPush.message(111, 1));
 		
 //		sendPushList(initService(User.role_shop), 
 //				Arrays.asList("465bc05d24382c851d42b34765ab075e1f01eba5a162fa004680c5419ecb6b58"), 
@@ -166,6 +166,7 @@ public class IosPush {
 				
 				return service;
 			} else {
+				System.out.println("init pro + role_shop");
 				ApnsService service = APNS
 						.newService()
 						.withCert(IosPush.class.getClassLoader().getResourceAsStream(pro_cert_shop), pro_pass_shop)
@@ -189,6 +190,7 @@ public class IosPush {
 				
 				return service;
 			} else {
+				System.out.println("init pro + role_ship");
 				ApnsService service = APNS
 						.newService()
 						.withCert(IosPush.class.getClassLoader().getResourceAsStream(pro_cert_ship), pro_pass_ship)
