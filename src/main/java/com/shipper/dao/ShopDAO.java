@@ -12,8 +12,12 @@ import com.shipper.logic.Constant;
 import com.shipper.logic.geo.GeoLogic;
 import com.shipper.model.Shop;
 import com.shipper.model.User;
+import com.shipper.util.LoggerUtil;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.log4j.Logger;
 
 public class ShopDAO {
+	public static Logger logger = LoggerUtil.getDailyLogger("ShopDAO_log"); 
 
 	
 
@@ -72,7 +76,7 @@ public class ShopDAO {
 			
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(e));
 		}
 		
 		return shop;
@@ -131,9 +135,9 @@ public class ShopDAO {
 			
 		    return true;
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(se));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(e));
 		} finally {
 			try {
 				if (stmt != null)
@@ -144,7 +148,7 @@ public class ShopDAO {
 				if (conn != null)
 					conn.close();
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error(ExceptionUtils.getStackTrace(se));
 			}
 		}
 		
@@ -184,9 +188,9 @@ public class ShopDAO {
 			
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(se));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(e));
 		} finally {
 			try {
 				if (stmt != null)
@@ -197,7 +201,7 @@ public class ShopDAO {
 				if (conn != null)
 					conn.close();
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error(ExceptionUtils.getStackTrace(se));
 			}
 		}
 		
@@ -220,9 +224,9 @@ public class ShopDAO {
 			stmt.executeUpdate(sql);
 			return true;
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(se));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(e));
 		} finally {
 			try {
 				if (stmt != null)
@@ -233,7 +237,7 @@ public class ShopDAO {
 				if (conn != null)
 					conn.close();
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error(ExceptionUtils.getStackTrace(se));
 			}
 		}
 		
@@ -256,9 +260,9 @@ public class ShopDAO {
 			stmt.executeUpdate(sql);
 			return true;
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(se));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(e));
 		} finally {
 			try {
 				if (stmt != null)
@@ -269,7 +273,7 @@ public class ShopDAO {
 				if (conn != null)
 					conn.close();
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error(ExceptionUtils.getStackTrace(se));
 			}
 		}
 		
@@ -291,9 +295,9 @@ public class ShopDAO {
 			stmt.executeUpdate(sql);
 			return true;
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(se));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(e));
 		} finally {
 			try {
 				if (stmt != null)
@@ -304,7 +308,7 @@ public class ShopDAO {
 				if (conn != null)
 					conn.close();
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error(ExceptionUtils.getStackTrace(se));
 			}
 		}
 		
@@ -336,9 +340,9 @@ public class ShopDAO {
 			stmt.executeUpdate(sql);
 			return true;
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(se));
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(ExceptionUtils.getStackTrace(e));
 		} finally {
 			try {
 				if (stmt != null)
@@ -349,7 +353,7 @@ public class ShopDAO {
 				if (conn != null)
 					conn.close();
 			} catch (SQLException se) {
-				se.printStackTrace();
+				logger.error(ExceptionUtils.getStackTrace(se));
 			}
 		}
 		

@@ -20,11 +20,11 @@ public class Constant {
 	public static final int error_phone = 8;
 	// JDBC driver name and database URL
 	public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	public static final String DB_URL = "jdbc:mysql://localhost/shipshop?useUnicode=true&characterEncoding=utf-8";
+	public static final String DB_URL = "jdbc:mysql://localhost:3306/shipshop?useUnicode=true&characterEncoding=utf-8";
 
 	// Database credentials
 	public static final String USER = "root";
-	public static final String PASS = "orek@db16";
+	public static final String PASS = null;//"";//"orek@db16";
 
 	
 	
